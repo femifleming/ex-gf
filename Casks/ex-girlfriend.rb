@@ -40,6 +40,9 @@ cask "ex-girlfriend" do
   zap trash: "~/Library/Application Support/ex-girlfriend"
 
   caveats <<~EOS
+    The plug-ins are not notarised. If your DAW refuses to load them, run:
+      xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/EX*.vst3 ~/Library/Audio/Plug-Ins/Components/EX*.component
+
     The free sample library is a separate cask:
       brew install --cask ex-girlfriend-sd-card
     (or choose any folder - e.g. a real disting EX MicroSD card - with the SD button in the plug-ins)

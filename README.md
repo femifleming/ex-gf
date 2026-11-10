@@ -36,6 +36,8 @@ brew trust femifleming/ex-girlfriend         # Homebrew 7+ asks you to trust thi
 brew install --cask ex-girlfriend            # apps + VST3 + AU
 brew install --cask ex-girlfriend-sd-card    # optional: the free sample library -> ~/Music/EX SD Card
 ```
+The builds aren't notarised. If your DAW won't load the plug-ins, clear the download flag with:
+`xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/EX*.vst3 ~/Library/Audio/Plug-Ins/Components/EX*.component`
 
 ### macOS / Linux - Homebrew from source
 ```sh
