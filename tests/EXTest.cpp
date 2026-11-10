@@ -225,6 +225,28 @@ int main (int argc, char** argv)
         }
         return 0;
     }
+    if (argc > 1 && juce::String (argv[1]) == "--check-card")
+    {
+        // loads every multisample folder and wavetable on the SD card (EX_SD_ROOT or the default) and reports problems
+        juce::ScopedJuceInitialiser_GUI gui;
+        int bad = 0;
+        for (auto& d : SdCard::sampleFolders())
+        {
+            auto set = SampleSet::load (d);
+            int files = 0; for (auto& z : set->zones) for (auto& l : z.layers) files += (int) l.size();
+            bool ok = ! set->zones.empty() && files > 0;
+            if (! ok) ++bad;
+            std::cout << (ok ? "ok   " : "BAD  ") << d.getFileName() << ": " << set->zones.size() << " zones, " << files << " files, "
+                      << (set->zones.empty() ? juce::String() : noteName (set->zones.front().natural) + ".." + noteName (set->zones.back().natural)) << std::endl;
+        }
+        for (auto& e : SdCard::tableEntries ("wavetables", "playlist-wavetable.txt"))
+        {
+            auto t = WaveTable::load (e, -1);
+            if (! t) { ++bad; std::cout << "BAD  wavetable " << e.getFileName() << std::endl; }
+        }
+        std::cout << (bad == 0 ? "CARD OK" : juce::String (bad) + " PROBLEMS") << std::endl;
+        return bad;
+    }
     if (argc > 2 && juce::String (argv[1]) == "--host")
     {
         juce::ScopedJuceInitialiser_GUI gui;

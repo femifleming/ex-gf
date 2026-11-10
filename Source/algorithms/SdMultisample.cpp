@@ -69,7 +69,7 @@ std::shared_ptr<SampleSet> SampleSet::load (const juce::File& folder)
     {
         auto pn = parseName (f.getFileName());
         auto wav = std::make_shared<WavData>();
-        if (! loadWav (f, *wav) || wav->frames < 2) continue;
+        if (! loadWav (f, *wav, -1, true) || wav->frames < 2) continue;
         auto fl = global;
         if (flags.count (f.getFileName())) fl.addArray (flags[f.getFileName()]);
         auto it = zoneIndex.find (pn.key);
@@ -412,7 +412,7 @@ void SdMultisample::renderVoices (float* const* out, int start, int n)
             auto at = [&] (int64_t k, int c) {
                 if (v.looping && k >= le) k = ls + (k - le) % juce::jmax ((int64_t) 1, le - ls);
                 k = juce::jlimit ((int64_t) 0, w.frames - 1, k);
-                return w.data[(size_t) (k * w.channels + c)];
+                return w.at ((size_t) (k * w.channels + c));
             };
             float sL = 0, sR = 0;
             for (int c = 0; c < 2; ++c)

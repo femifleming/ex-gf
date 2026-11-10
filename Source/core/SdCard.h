@@ -113,16 +113,18 @@ struct WavData
     int channels = 0;
     double sampleRate = 48000;
     int64_t frames = 0;
-    std::vector<float> data; // interleaved
+    std::vector<float> data;      // interleaved (normal mode)
+    std::vector<int16_t> data16;  // interleaved (compact mode: half the memory, used for big multisample folders)
     int64_t loopStart = -1, loopEnd = -1; // loopEnd exclusive
     bool hasLoop() const { return loopStart >= 0 && loopEnd > loopStart; }
-    float sample (int64_t frame, int ch) const { return data[(size_t) (frame * channels + std::min (ch, channels - 1))]; }
+    float at (size_t i) const { return data16.empty() ? data[i] : (float) data16[i] * (1.0f / 32768.0f); }
+    float sample (int64_t frame, int ch) const { return at ((size_t) (frame * channels + std::min (ch, channels - 1))); }
 };
 
 inline uint32_t rd32 (const uint8_t* p) { return (uint32_t) p[0] | ((uint32_t) p[1] << 8) | ((uint32_t) p[2] << 16) | ((uint32_t) p[3] << 24); }
 inline uint16_t rd16 (const uint8_t* p) { return (uint16_t) (p[0] | (p[1] << 8)); }
 
-inline bool loadWav (const juce::File& file, WavData& out, int64_t maxFrames = -1)
+inline bool loadWav (const juce::File& file, WavData& out, int64_t maxFrames = -1, bool compact = false)
 {
     juce::MemoryBlock mb;
     if (! file.loadFileAsData (mb) || mb.getSize() < 12) return false;
@@ -184,7 +186,9 @@ inline bool loadWav (const juce::File& file, WavData& out, int64_t maxFrames = -
     out.channels = std::min (ch, 2);
     out.sampleRate = sr > 0 ? sr : 48000;
     out.frames = frames;
-    out.data.resize ((size_t) (frames * out.channels));
+    out.data.clear(); out.data16.clear();
+    if (compact) out.data16.resize ((size_t) (frames * out.channels));
+    else out.data.resize ((size_t) (frames * out.channels));
     for (int64_t f = 0; f < frames; ++f)
         for (int c2 = 0; c2 < out.channels; ++c2)
         {
@@ -196,7 +200,9 @@ inline bool loadWav (const juce::File& file, WavData& out, int64_t maxFrames = -
             else if (bits == 16) v = (int16_t) rd16 (s) / 32768.0f;
             else if (bits == 24) { int32_t x = (int32_t) ((uint32_t) s[0] << 8 | (uint32_t) s[1] << 16 | (uint32_t) s[2] << 24); v = (float) (x / 2147483648.0); }
             else if (bits == 32) v = (float) ((int32_t) rd32 (s) / 2147483648.0);
-            out.data[(size_t) (f * out.channels + c2)] = v;
+            const size_t di = (size_t) (f * out.channels + c2);
+            if (compact) out.data16[di] = (int16_t) juce::jlimit (-32768, 32767, (int) std::lrint (v * 32768.0f));
+            else out.data[di] = v;
         }
     // loops: cue regions/markers take the rules from the manual; smpl chunk as fallback
     out.loopStart = out.loopEnd = -1;
