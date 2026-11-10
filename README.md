@@ -79,6 +79,21 @@ On Linux you need: `libasound2-dev libjack-jackd2-dev libfreetype6-dev libfontco
 
 Every push runs CI on macOS, Windows and Linux. It builds the plug-ins, runs the tests, loads every plug-in in a test host, and publishes release packages for tags.
 
+## Human contributions
+
+ex-girlfriend's code was written with Claude Code (Anthropic), working under the direction of its author, [femifleming](https://github.com/femifleming). This is what the author brought to it:
+
+- **Concept and scope.** The author chose the Expert Sleepers disting EX as the model: a plug-in and desktop app that work like its SD Multisample mode and read its multisample file format. They also asked for its Poly Wavetable, Poly FM and Poly Exciter algorithms as matching instruments, all in the same style.
+- **WAV Recorder mode.** The workflow that sends MIDI out and records audio in to build new multisample sets.
+- **Reference material.** The author supplied the disting EX user manual as the reference for how the modes behave and how the display looks.
+- **Free sample library.** The author asked for free multisample libraries to be found and bundled.
+- **Visual direction.** The pixel aesthetic of the disting EX display, applied to the whole plug-in rather than a single panel, and made easy to use rather than a literal copy.
+- **Layout choice.** The author asked to see options, then picked the "split browser" layout from four mock-ups.
+- **WaveEdit import.** Poly Wavetable loads the author's own wavetables made in the WaveEdit app.
+- **Testing.** The author asked for all four instruments to be tested and to remember their last state.
+- **Platforms and distribution.** Builds for macOS, Windows and Linux, packaged with a README and instructions as one bundle in a public GitHub repo, with a Homebrew install.
+- **The name.** The author named the suite "ex-girlfriend" (it was "EX Suite" before).
+
 ## Credits & licence
 - The code is licensed **AGPL-3.0** (see `LICENSE`), as required for software built with [JUCE](https://juce.com) 9 under its open-source licence.
 - The Poly FM engine is from [Mutable Instruments Plaits](https://github.com/pichenettes/eurorack) by Émilie Gillet (MIT; subset in `third_party/mi`).
