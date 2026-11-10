@@ -19,15 +19,17 @@ struct SdCard
         if (! pf)
         {
             juce::PropertiesFile::Options o;
-            o.applicationName = "ex-girlfriend"; o.filenameSuffix = "settings"; o.folderName = "ex-girlfriend";
+            o.applicationName = "EX-GF"; o.filenameSuffix = "settings"; o.folderName = "EX-GF";
             o.osxLibrarySubFolder = "Application Support";
-            // one-time migration from the pre-release name ("EX Suite")
+            // one-time migration from the earlier names of the suite ("ex-girlfriend", "EX Suite")
             auto newDir = o.getDefaultFile().getParentDirectory();
-            juce::PropertiesFile::Options old = o;
-            old.applicationName = "EX Suite"; old.folderName = "EX Suite";
-            auto oldDir = old.getDefaultFile().getParentDirectory();
-            if (! newDir.isDirectory() && oldDir.isDirectory())
+            for (auto oldName : { "ex-girlfriend", "EX Suite" })
             {
+                if (newDir.isDirectory()) break;
+                juce::PropertiesFile::Options old = o;
+                old.applicationName = oldName; old.folderName = oldName;
+                auto oldDir = old.getDefaultFile().getParentDirectory();
+                if (! oldDir.isDirectory()) continue;
                 oldDir.copyDirectoryTo (newDir);
                 auto oldSettings = newDir.getChildFile (old.getDefaultFile().getFileName());
                 if (oldSettings.existsAsFile()) oldSettings.moveFileTo (o.getDefaultFile());

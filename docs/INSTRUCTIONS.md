@@ -1,4 +1,4 @@
-# ex-girlfriend - instructions
+# EX-GF - instructions
 
 ## The screen
 
@@ -23,7 +23,7 @@ IN *                  status line - hover for help                     * OUT
 | Keyboard | **A W S E D F T G Y H U J K O L P ;** play notes, **Z/X** change octave. Click the window first so it has focus. |
 | Window | Drag the corner to resize. It snaps to whole-pixel sizes (1×, 2×, 3×…) so pixels stay sharp. |
 
-**Remembering state:** in a DAW, each instance saves with your project. The plug-ins also keep a *last state* file (in `~/Library/Application Support/ex-girlfriend`, `%APPDATA%\ex-girlfriend` or `~/.config/ex-girlfriend`). New instances and the standalone apps start from where you left off.
+**Remembering state:** in a DAW, each instance saves with your project. The plug-ins also keep a *last state* file (in `~/Library/Application Support/EX-GF`, `%APPDATA%\EX-GF` or `~/.config/EX-GF`). New instances and the standalone apps start from where you left off.
 
 **Outputs:** *Out 1/2* is the main stereo bus. *Out 3/4* is a second stereo bus. Enable it in your DAW to get per-timbre/per-voice outputs, the paraphonic gate and the mono mix, plus the auto-sampler's CV/gate.
 

@@ -82,7 +82,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ex-girlfriend-${{ matrix.name }}
+          name: EX-GF-${{ matrix.name }}
           path: |
             dist/*.zip
             dist/*.pkg

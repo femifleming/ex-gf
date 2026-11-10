@@ -7,7 +7,7 @@ if(APPLE)
     endif()
 endif()
 
-project(ExGirlfriend VERSION 1.0.0 LANGUAGES C CXX)
+project(EXGF VERSION 1.0.1 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -40,7 +40,7 @@ function(ex_plugin target product code desc sources midiOut)
     juce_add_plugin(${target}
         VERSION ${PROJECT_VERSION}
         COMPANY_NAME "FreakiePie"
-        COMPANY_WEBSITE "https://github.com/femifleming/ex-girlfriend"
+        COMPANY_WEBSITE "https://github.com/femifleming/ex-gf"
         BUNDLE_ID "com.freakiepie.${target}"
         PLUGIN_MANUFACTURER_CODE Frkp
         PLUGIN_CODE ${code}
@@ -55,7 +55,7 @@ function(ex_plugin target product code desc sources midiOut)
         EDITOR_WANTS_KEYBOARD_FOCUS TRUE
         AU_MAIN_TYPE kAudioUnitType_MusicDevice
         VST3_CATEGORIES Instrument Synth
-        LV2URI "https://github.com/femifleming/ex-girlfriend/${target}"
+        LV2URI "https://github.com/femifleming/ex-gf/${target}"
         MICROPHONE_PERMISSION_ENABLED TRUE
         MICROPHONE_PERMISSION_TEXT "Audio input is used to record and auto-sample instruments."
         COPY_PLUGIN_AFTER_BUILD ${EX_COPY_AFTER_BUILD})

@@ -1,4 +1,4 @@
-# ex-girlfriend
+# EX-GF
 
 Four instruments modelled on algorithms of the Expert Sleepers **disting EX** Eurorack module. Each one comes as a **VST3**, an **AU** (macOS), an **LV2** (Linux) and a **standalone app**, for **macOS, Windows and Linux**:
 
@@ -27,34 +27,34 @@ The whole interface is drawn as one white-on-black pixel display in the module's
 
 ## Install
 
-Releases: **https://github.com/femifleming/ex-girlfriend/releases**
+Releases: **https://github.com/femifleming/ex-gf/releases**
 
 ### macOS - Homebrew
 ```sh
-brew tap femifleming/ex-girlfriend https://github.com/femifleming/ex-girlfriend
-brew trust femifleming/ex-girlfriend         # Homebrew 7+ asks you to trust third-party taps
-brew install --cask ex-girlfriend            # apps + VST3 + AU
-brew install --cask ex-girlfriend-sd-card    # optional: the free sample library -> ~/Music/EX SD Card
+brew tap femifleming/ex-gf https://github.com/femifleming/ex-gf
+brew trust femifleming/ex-gf         # Homebrew 7+ asks you to trust third-party taps
+brew install --cask ex-gf            # apps + VST3 + AU
+brew install --cask ex-gf-sd-card    # optional: the free sample library -> ~/Music/EX SD Card
 ```
 The builds aren't notarised. If your DAW won't load the plug-ins, clear the download flag with:
 `xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/EX*.vst3 ~/Library/Audio/Plug-Ins/Components/EX*.component`
 
 ### macOS / Linux - Homebrew from source
 ```sh
-brew tap femifleming/ex-girlfriend https://github.com/femifleming/ex-girlfriend
-brew trust femifleming/ex-girlfriend
-brew install ex-girlfriend                   # builds from source; `brew info ex-girlfriend` shows where the plug-ins went
+brew tap femifleming/ex-gf https://github.com/femifleming/ex-gf
+brew trust femifleming/ex-gf
+brew install ex-gf                   # builds from source; `brew info ex-gf` shows where the plug-ins went
 ```
 
 ### macOS (download)
-Download `ex-girlfriend-<version>-macOS.zip`, unzip it and double-click **install.command**. Or run `ex-girlfriend-<version>-macOS.pkg`, then right-click → Open, because the builds aren't notarised.
+Download `EX-GF-<version>-macOS.zip`, unzip it and double-click **install.command**. Or run `EX-GF-<version>-macOS.pkg`, then right-click → Open, because the builds aren't notarised.
 
 ### Windows
-Download `ex-girlfriend-<version>-Windows-x64.zip`, unzip it, right-click **install.ps1** → *Run with PowerShell* (as administrator). VST3 plug-ins go to `C:\Program Files\Common Files\VST3`, and the apps go in the Start menu under **ex-girlfriend**.
+Download `EX-GF-<version>-Windows-x64.zip`, unzip it, right-click **install.ps1** → *Run with PowerShell* (as administrator). VST3 plug-ins go to `C:\Program Files\Common Files\VST3`, and the apps go in the Start menu under **EX-GF**.
 
 ### Linux
 ```sh
-tar xzf ex-girlfriend-<version>-Linux-x86_64.tar.gz && cd ex-girlfriend-*-Linux-* && ./install.sh
+tar xzf EX-GF-<version>-Linux-x86_64.tar.gz && cd ex-gf-*-Linux-* && ./install.sh
 ```
 This puts VST3 in `~/.vst3`, LV2 in `~/.lv2` and the apps in `~/.local/bin`, with menu entries.
 
@@ -62,7 +62,7 @@ This puts VST3 in `~/.vst3`, LV2 in `~/.lv2` and the apps in `~/.local/bin`, wit
 Download **EX-SD-Card.zip** from the release and unzip it into your Music folder, so you get `Music/EX SD Card`. Or choose any folder with the **SD** button. It contains 18 multisampled instruments, 38 wavetables, 5 exciter tables, DX7 banks and tuning files, all free (CC0 / CC-BY / MIT). See `CREDITS.txt` inside for sources and licences.
 
 ## Using it
-📖 **[PDF manual](docs/ex-girlfriend-manual.pdf)** (also attached to each release). The same material is in **[docs/INSTRUCTIONS.md](docs/INSTRUCTIONS.md)** for the full guide. The short version:
+📖 **[PDF manual](docs/EX-GF-manual.pdf)** (also attached to each release). The same material is in **[docs/INSTRUCTIONS.md](docs/INSTRUCTIONS.md)** for the full guide. The short version:
 - **Lists:** click a folder, wavetable, bank or voice to load it.
 - **Parameter tiles:** drag up/down or use the mouse wheel. Hold shift for fine steps, double-click to reset. Tiles with a ▾ open a list of choices.
 - **Display:** the wheel moves through parameters and shift+wheel changes the value. ↑↓ / ←→ / Enter / Esc work like the module's P and V encoders.
@@ -71,14 +71,14 @@ Download **EX-SD-Card.zip** from the release and unzip it into your Music folder
 
 ## Build from source
 ```sh
-git clone --recursive https://github.com/femifleming/ex-girlfriend && cd ex-girlfriend
+git clone --recursive https://github.com/femifleming/ex-gf && cd ex-gf
 cmake -B build -DCMAKE_BUILD_TYPE=Release        # add -G Ninja if you have it
 cmake --build build --config Release
 build/EXTest_artefacts/Release/EXTest out          # offline tests
 build/EXTest_artefacts/Release/EXTest --host build/*_artefacts/Release/VST3/*.vst3   # load the plug-ins like a DAW
 ```
 Options: `-DEX_COPY_AFTER_BUILD=ON` installs into your plug-in folders, and `-DEX_BUILD_TESTS=OFF` skips the test tool.
-Manual: `EXTest --dump-params params.json && python3 tools/make_manual.py params.json docs/ex-girlfriend-manual.pdf` (needs `pip install reportlab pillow`).
+Manual: `EXTest --dump-params params.json && python3 tools/make_manual.py params.json docs/EX-GF-manual.pdf` (needs `pip install reportlab pillow`).
 Release packages: `packaging/package-macos.sh`, `packaging/package-linux.sh`, `packaging/package-windows.ps1`.
 On Linux you need: `libasound2-dev libjack-jackd2-dev libfreetype6-dev libfontconfig1-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libxi-dev libgl1-mesa-dev`.
 
@@ -86,7 +86,7 @@ Every push runs CI on macOS, Windows and Linux. It builds the plug-ins, runs the
 
 ## Human contributions
 
-ex-girlfriend's code was written with Claude Code (Anthropic), working under the direction of its author, [femifleming](https://github.com/femifleming). This is what the author brought to it:
+EX-GF's code was written with Claude Code (Anthropic), working under the direction of its author, [femifleming](https://github.com/femifleming). This is what the author brought to it:
 
 - **Concept and scope.** The author chose the Expert Sleepers disting EX as the model: a plug-in and desktop app that work like its SD Multisample mode and read its multisample file format. They also asked for its Poly Wavetable, Poly FM and Poly Exciter algorithms as matching instruments, all in the same style.
 - **WAV Recorder mode.** The workflow that sends MIDI out and records audio in to build new multisample sets.
@@ -97,7 +97,7 @@ ex-girlfriend's code was written with Claude Code (Anthropic), working under the
 - **WaveEdit import.** Poly Wavetable loads the author's own wavetables made in the WaveEdit app.
 - **Testing.** The author asked for all four instruments to be tested and to remember their last state.
 - **Platforms and distribution.** Builds for macOS, Windows and Linux, packaged with a README and instructions as one bundle in a public GitHub repo, with a Homebrew install.
-- **The name.** The author named the suite "ex-girlfriend" (it was "EX Suite" before).
+- **The name.** The author named the suite "EX-GF" (it was "EX Suite" before).
 
 ## Credits & licence
 - The code is licensed **AGPL-3.0** (see `LICENSE`), as required for software built with [JUCE](https://juce.com) 9 under its open-source licence.

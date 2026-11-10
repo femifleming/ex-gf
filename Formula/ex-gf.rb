@@ -1,11 +1,11 @@
-class ExGirlfriend < Formula
+class ExGf < Formula
   desc "Disting EX-style instruments (VST3/AU/LV2 + standalone apps)"
-  homepage "https://github.com/femifleming/ex-girlfriend"
-  url "https://github.com/femifleming/ex-girlfriend.git",
-      tag:      "v1.0.0",
-      revision: "749b55b33943e99807cb135403e6550862d18b11"
+  homepage "https://github.com/femifleming/ex-gf"
+  url "https://github.com/femifleming/ex-gf.git",
+      tag:      "v1.0.1",
+      revision: "GIT_REVISION"
   license "AGPL-3.0-only"
-  head "https://github.com/femifleming/ex-girlfriend.git", branch: "main"
+  head "https://github.com/femifleming/ex-gf.git", branch: "main"
 
   depends_on "cmake" => :build
   depends_on "ninja" => :build
@@ -53,7 +53,7 @@ class ExGirlfriend < Formula
           ln -sf #{opt_lib}/vst3/*.vst3 ~/Library/Audio/Plug-Ins/VST3/
           ln -sf #{opt_lib}/Components/*.component ~/Library/Audio/Plug-Ins/Components/
           ln -sf #{opt_prefix}/*.app ~/Applications/
-        (Prebuilt binaries: brew install --cask ex-girlfriend)
+        (Prebuilt binaries: brew install --cask ex-gf)
       EOS
     else
       <<~EOS

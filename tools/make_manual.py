@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds docs/ex-girlfriend-manual.pdf (white on black, headings in the module's 5x7 pixel font).
+"""Builds docs/EX-GF-manual.pdf (white on black, headings in the module's 5x7 pixel font).
 
     python3 tools/make_manual.py <params.json> <out.pdf>
 params.json comes from:  EXTest --dump-params params.json
@@ -16,7 +16,7 @@ from reportlab.platypus import (BaseDocTemplate, PageTemplate, Frame, Paragraph,
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PARAMS = json.load(open(sys.argv[1]))
 OUT = sys.argv[2]
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 # ------------------------------------------------------------------ pixel font (from Source/core/ExFont.h)
 FONT = {}
@@ -203,7 +203,7 @@ def alg(number):
 class Doc(BaseDocTemplate):
     def __init__(self, path):
         super().__init__(path, pagesize=A4, leftMargin=18 * mm, rightMargin=18 * mm, topMargin=18 * mm, bottomMargin=18 * mm,
-                         title="ex-girlfriend manual", author="ex-girlfriend", subject="disting EX-style instruments - user manual")
+                         title="EX-GF manual", author="EX-GF", subject="disting EX-style instruments - user manual")
         frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height, id="f")
         self.addPageTemplates([PageTemplate("cover", [frame], onPage=self.bg_cover), PageTemplate("page", [frame], onPage=self.bg)])
         self.toc = []
@@ -213,7 +213,7 @@ class Doc(BaseDocTemplate):
 
     def bg(self, c, d):
         c.setFillColor(BLACK); c.rect(0, 0, A4[0], A4[1], stroke=0, fill=1)
-        draw_pixel_text(c, "EX-GIRLFRIEND MANUAL", 18 * mm, 12 * mm, 0.9, DIM)
+        draw_pixel_text(c, "EX-GF MANUAL", 18 * mm, 12 * mm, 0.9, DIM)
         n = str(c.getPageNumber())
         draw_pixel_text(c, n, A4[0] - 18 * mm - pixel_width(n, 1.2), 12.5 * mm, 1.2, GREY)
 
@@ -262,14 +262,14 @@ def story(doc):
     s = []
     # ---------------- cover
     s.append(Spacer(1, 40 * mm))
-    s.append(PixelHeading("EX-GIRLFRIEND", px=6.2, align="center", rule=False, space=10))
+    s.append(PixelHeading("EX-GF", px=12, align="center", rule=False, space=14))
     s.append(PixelHeading("USER MANUAL", px=2.2, align="center", rule=False, space=20))
     s.append(shot("fm", 165 * mm))
     s.append(Spacer(1, 10 * mm))
     s.append(P("<para alignment='center'>Four disting EX-style instruments: <b>EX Multisample</b> · <b>EX Poly Wavetable</b> · "
                "<b>EX Poly FM</b> · <b>EX Poly Exciter</b><br/>VST3 · AU · LV2 · standalone - macOS, Windows and Linux</para>"))
     s.append(Spacer(1, 30 * mm))
-    s.append(P(f"<para alignment='center'>Version {VERSION} - github.com/femifleming/ex-girlfriend</para>", small))
+    s.append(P(f"<para alignment='center'>Version {VERSION} - github.com/femifleming/ex-gf</para>", small))
     from reportlab.platypus.doctemplate import NextPageTemplate
     s.append(NextPageTemplate("page"))
     s.append(PageBreak())
@@ -282,7 +282,7 @@ def story(doc):
 
     # ---------------- intro
     s.append(H1("INTRODUCTION"))
-    s.append(P("<b>ex-girlfriend</b> is a suite of four software instruments modelled on algorithms of the Expert Sleepers "
+    s.append(P("<b>EX-GF</b> is a suite of four software instruments modelled on algorithms of the Expert Sleepers "
                "<b>disting EX</b> Eurorack module. They follow the module's manual (firmware 1.26) parameter for parameter, "
                "use the same file formats (sample folders, wavetables, exciters, DX7 banks, Scala tunings) and wear the "
                "module's look: the whole window is one white-on-black pixel display in the module's own 5×7 font."))
@@ -298,30 +298,30 @@ def story(doc):
     s.append(P("Each instrument is available as a <b>VST3</b> (all platforms), <b>Audio Unit</b> (macOS), <b>LV2</b> (Linux) and a "
                "<b>standalone app</b>. Settings are saved with your DAW project, and every plug-in also remembers its last state "
                "between sessions."))
-    s.append(P("ex-girlfriend is not affiliated with or endorsed by Expert Sleepers; \"disting\" is their trademark and is used "
+    s.append(P("EX-GF is not affiliated with or endorsed by Expert Sleepers; \"disting\" is their trademark and is used "
                "only to describe compatibility. If you own the module, its MicroSD card works directly with these plug-ins.", small))
 
     # ---------------- install
     s.append(H1("INSTALLING"))
-    s.append(P("All downloads are on the release page: <b>github.com/femifleming/ex-girlfriend/releases</b>."))
+    s.append(P("All downloads are on the release page: <b>github.com/femifleming/ex-gf/releases</b>."))
     s.append(H2("MACOS - HOMEBREW"))
-    s.append(C("brew tap femifleming/ex-girlfriend https://github.com/femifleming/ex-girlfriend\n"
-               "brew trust femifleming/ex-girlfriend\n"
-               "brew install --cask ex-girlfriend            # apps + VST3 + AU\n"
-               "brew install --cask ex-girlfriend-sd-card    # optional sample library"))
+    s.append(C("brew tap femifleming/ex-gf https://github.com/femifleming/ex-gf\n"
+               "brew trust femifleming/ex-gf\n"
+               "brew install --cask ex-gf            # apps + VST3 + AU\n"
+               "brew install --cask ex-gf-sd-card    # optional sample library"))
     s.append(P("Homebrew 7 asks you to <i>trust</i> third-party taps once. To build from source instead (macOS or Linux): "
-               "<font face='Courier'>brew install ex-girlfriend</font>, then follow the link instructions it prints."))
+               "<font face='Courier'>brew install ex-gf</font>, then follow the link instructions it prints."))
     s.append(H2("MACOS - DOWNLOAD"))
-    s += B(["<b>ex-girlfriend-1.0.0-macOS.zip</b>: unzip and double-click <b>install.command</b> - apps go to ~/Applications, plug-ins to "
+    s += B(["<b>EX-GF-1.0.1-macOS.zip</b>: unzip and double-click <b>install.command</b> - apps go to ~/Applications, plug-ins to "
             "~/Library/Audio/Plug-Ins/VST3 and /Components.",
-            "<b>ex-girlfriend-1.0.0-macOS.pkg</b>: installs for all users (right-click → Open the first time).",
+            "<b>EX-GF-1.0.1-macOS.pkg</b>: installs for all users (right-click → Open the first time).",
             "The builds are universal (Apple silicon + Intel) but not notarised. If macOS or your DAW refuses to open them, run:"])
     s.append(C("xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/EX*.vst3 \\\n    ~/Library/Audio/Plug-Ins/Components/EX*.component ~/Applications/EX*.app"))
     s.append(H2("WINDOWS"))
-    s.append(P("Unzip <b>ex-girlfriend-1.0.0-Windows-x64.zip</b>, right-click <b>install.ps1</b> → <i>Run with PowerShell</i> (as administrator). "
-               "VST3 plug-ins go to C:\\Program Files\\Common Files\\VST3; the apps appear in the Start menu under <b>ex-girlfriend</b>."))
+    s.append(P("Unzip <b>EX-GF-1.0.1-Windows-x64.zip</b>, right-click <b>install.ps1</b> → <i>Run with PowerShell</i> (as administrator). "
+               "VST3 plug-ins go to C:\\Program Files\\Common Files\\VST3; the apps appear in the Start menu under <b>EX-GF</b>."))
     s.append(H2("LINUX"))
-    s.append(C("tar xzf ex-girlfriend-1.0.0-Linux-x86_64.tar.gz\ncd ex-girlfriend-1.0.0-Linux-x86_64 && ./install.sh"))
+    s.append(C("tar xzf EX-GF-1.0.1-Linux-x86_64.tar.gz\ncd ex-gf-1.0.1-Linux-x86_64 && ./install.sh"))
     s.append(P("VST3 → ~/.vst3, LV2 → ~/.lv2, apps → ~/.local/bin with desktop menu entries."))
     s.append(H2("THE SAMPLE LIBRARY"))
     s.append(P("Download <b>EX-SD-Card.zip</b> and unzip it into your <b>Music</b> folder so you have <b>Music/EX SD Card</b> (the default "
@@ -329,7 +329,7 @@ def story(doc):
                "tables, DX7 banks and Scala tunings - all free (CC0 / CC-BY / MIT, see CREDITS.txt inside). A real disting EX MicroSD "
                "card works too."))
     s.append(H2("BUILDING FROM SOURCE"))
-    s.append(C("git clone --recursive https://github.com/femifleming/ex-girlfriend\ncd ex-girlfriend\n"
+    s.append(C("git clone --recursive https://github.com/femifleming/ex-gf\ncd ex-gf\n"
                "cmake -B build -DCMAKE_BUILD_TYPE=Release\ncmake --build build --config Release"))
 
     # ---------------- interface
@@ -369,8 +369,8 @@ def story(doc):
     s += B(["In a DAW, each instance is saved with the project.",
             "<b>SAVE</b> writes a preset to <i>SD card/presets/&lt;plug-in&gt;</i>; <b>LOAD</b> lists them (plus <i>Reset to defaults</i>).",
             "Every plug-in and app also remembers its <b>last state</b>: it is written whenever you change something and when the plug-in closes, "
-            "and a new instance starts from it. The files live in ~/Library/Application Support/ex-girlfriend (macOS), "
-            "%APPDATA%\\ex-girlfriend (Windows) or ~/.config/ex-girlfriend (Linux)."])
+            "and a new instance starts from it. The files live in ~/Library/Application Support/EX-GF (macOS), "
+            "%APPDATA%\\EX-GF (Windows) or ~/.config/EX-GF (Linux)."])
 
     # ---------------- SD card
     s.append(PageBreak())
@@ -492,7 +492,7 @@ def story(doc):
     s += B(["<b>T1 … T4</b>: output, gain, pan, <i>Brightness</i> (modulator depth) and <i>Env scale</i> (envelope times) per timbre.",
             "<b>VOICE</b>: max voices, unison, master gain, velocity → brightness, voice transpose and output mode. "
             "<b>CHORD</b>, <b>FX</b> (chorus, delay), <b>KEYS</b>.",
-            "Parameters 54-64 are not listed in the module's manual; ex-girlfriend uses them for the voice and effect extras."])
+            "Parameters 54-64 are not listed in the module's manual; EX-GF uses them for the voice and effect extras."])
     s.append(H2("EDITING WITH A DX7 EDITOR"))
     s.append(P("Point a DX7 editor/librarian (Dexed, Patch Base, MIDI Quest …) at the plug-in. Single-voice dumps, parameter edits and dump "
                "requests apply to the timbre chosen by <i>SysEx target</i>; the display then shows <b>VOICE EDITED</b>. From MENU → Poly FM: "
@@ -548,7 +548,7 @@ def story(doc):
 
     # ---------------- credits
     s.append(H1("CREDITS AND LICENCE"))
-    s += B(["ex-girlfriend is open source under the <b>GNU AGPL-3.0</b>; source code at github.com/femifleming/ex-girlfriend.",
+    s += B(["EX-GF is open source under the <b>GNU AGPL-3.0</b>; source code at github.com/femifleming/ex-gf.",
             "Built with JUCE 9 (AGPLv3). Poly FM uses the FM engine of Mutable Instruments Plaits by Émilie Gillet (MIT).",
             "Behaviour follows the disting EX user manual by Expert Sleepers. Not affiliated with Expert Sleepers.",
             "Sample library: VSCO-2 Community Edition, Karoryfer (Emily Guitar, Growlybass, Hadzi-Fia), Virtuosity Drums, AKWF wavetables, "

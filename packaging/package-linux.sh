@@ -3,11 +3,11 @@
 #   packaging/package-linux.sh [version]
 set -euo pipefail
 cd "$(dirname "$0")/.."
-VERSION="${1:-$(grep -m1 'project(ExGirlfriend VERSION' CMakeLists.txt | sed -E 's/.*VERSION ([0-9.]+).*/\1/')}"
+VERSION="${1:-$(grep -m1 'project(EXGF VERSION' CMakeLists.txt | sed -E 's/.*VERSION ([0-9.]+).*/\1/')}"
 BUILD=build-release
 cmake -B "$BUILD" -G Ninja -DCMAKE_BUILD_TYPE=Release -DEX_COPY_AFTER_BUILD=OFF -DEX_BUILD_TESTS=ON
 cmake --build "$BUILD" --config Release
-NAME="ex-girlfriend-$VERSION-Linux-$(uname -m)"
+NAME="EX-GF-$VERSION-Linux-$(uname -m)"
 STAGE="dist/$NAME"
 rm -rf "$STAGE" && mkdir -p "$STAGE/vst3" "$STAGE/lv2" "$STAGE/bin"
 for t in EXMultisample EXPolyWavetable EXPolyFM EXPolyExciter; do
@@ -16,7 +16,7 @@ for t in EXMultisample EXPolyWavetable EXPolyFM EXPolyExciter; do
   cp -r "$A/LV2/"*.lv2 "$STAGE/lv2/"
   cp "$A/Standalone/"* "$STAGE/bin/"
 done
-cp packaging/linux/install.sh packaging/INSTALL.txt docs/ex-girlfriend-manual.pdf "$STAGE/"
+cp packaging/linux/install.sh packaging/INSTALL.txt docs/EX-GF-manual.pdf "$STAGE/"
 chmod +x "$STAGE/install.sh"
 tar -C dist -czf "dist/$NAME.tar.gz" "$NAME"
 sha256sum "dist/$NAME.tar.gz"
