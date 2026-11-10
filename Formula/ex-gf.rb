@@ -3,7 +3,7 @@ class ExGf < Formula
   homepage "https://github.com/femifleming/ex-gf"
   url "https://github.com/femifleming/ex-gf.git",
       tag:      "v1.0.1",
-      revision: "GIT_REVISION"
+      revision: "1a357d3ba21c2924f8e63c74956d3ef6aab46a64"
   license "AGPL-3.0-only"
   head "https://github.com/femifleming/ex-gf.git", branch: "main"
 
