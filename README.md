@@ -75,7 +75,7 @@ build/EXTest_artefacts/Release/EXTest --host build/*_artefacts/Release/VST3/*.vs
 ```
 Options: `-DEX_COPY_AFTER_BUILD=ON` installs into your plug-in folders, and `-DEX_BUILD_TESTS=OFF` skips the test tool.
 Release packages: `packaging/package-macos.sh`, `packaging/package-linux.sh`, `packaging/package-windows.ps1`.
-On Linux you need: `libasound2-dev libjack-jackd2-dev libfreetype6-dev libfontconfig1-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libgl1-mesa-dev`.
+On Linux you need: `libasound2-dev libjack-jackd2-dev libfreetype6-dev libfontconfig1-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libxi-dev libgl1-mesa-dev`.
 
 Every push runs CI on macOS, Windows and Linux. It builds the plug-ins, runs the tests, loads every plug-in in a test host, and publishes release packages for tags.
 

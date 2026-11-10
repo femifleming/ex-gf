@@ -19,6 +19,7 @@ class ExSuite < Formula
     depends_on "libxcomposite"
     depends_on "libxcursor"
     depends_on "libxext"
+    depends_on "libxi"
     depends_on "libxinerama"
     depends_on "libxrandr"
     depends_on "libxrender"
