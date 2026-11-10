@@ -18,7 +18,7 @@ for t in EXMultisample EXPolyWavetable EXPolyFM EXPolyExciter; do
 done
 # ad-hoc signatures (no Apple developer ID): Gatekeeper still needs the quarantine flag removed, see install.command
 find "$STAGE" -maxdepth 2 \( -name "*.vst3" -o -name "*.component" -o -name "*.app" \) -exec codesign --force --deep -s - {} \;
-cp packaging/macos/install.command "$STAGE/"
+cp packaging/macos/install.command docs/ex-girlfriend-manual.pdf "$STAGE/"
 cp packaging/INSTALL.txt "$STAGE/"
 chmod +x "$STAGE/install.command"
 (cd dist && ditto -c -k --keepParent "$NAME" "$NAME.zip")

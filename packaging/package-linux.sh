@@ -16,7 +16,7 @@ for t in EXMultisample EXPolyWavetable EXPolyFM EXPolyExciter; do
   cp -r "$A/LV2/"*.lv2 "$STAGE/lv2/"
   cp "$A/Standalone/"* "$STAGE/bin/"
 done
-cp packaging/linux/install.sh packaging/INSTALL.txt "$STAGE/"
+cp packaging/linux/install.sh packaging/INSTALL.txt docs/ex-girlfriend-manual.pdf "$STAGE/"
 chmod +x "$STAGE/install.sh"
 tar -C dist -czf "dist/$NAME.tar.gz" "$NAME"
 sha256sum "dist/$NAME.tar.gz"

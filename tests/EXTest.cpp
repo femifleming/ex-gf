@@ -225,6 +225,47 @@ int main (int argc, char** argv)
         }
         return 0;
     }
+    if (argc > 2 && juce::String (argv[1]) == "--dump-params")
+    {
+        // writes every algorithm's parameters (number, name, range, default, unit, value names, section) as JSON
+        juce::ScopedJuceInitialiser_GUI gui;
+        ExPlugin::rememberLastState = false;
+        juce::Array<juce::var> algsOut;
+        for (juce::String kind : { "ms", "wt", "fm", "ex" })
+        {
+            auto p = make (kind);
+            for (int ai = 0; ai < p->numAlgorithms(); ++ai)
+            {
+                auto& a = p->algAt (ai);
+                auto* ao = new juce::DynamicObject();
+                ao->setProperty ("plugin", p->identity.product);
+                ao->setProperty ("number", a.number);
+                ao->setProperty ("name", a.name);
+                juce::Array<juce::var> params;
+                for (int n = 1; n <= a.numParams(); ++n)
+                {
+                    const auto& d = a.def (n);
+                    auto* po = new juce::DynamicObject();
+                    po->setProperty ("n", n); po->setProperty ("name", d.name);
+                    po->setProperty ("min", d.min); po->setProperty ("max", d.max); po->setProperty ("def", d.def);
+                    po->setProperty ("unit", d.unit);
+                    juce::String section;
+                    for (auto& sec : a.sections) for (int q : sec.params) if (q == n) section = sec.name;
+                    po->setProperty ("section", section);
+                    juce::StringArray vals;
+                    if (! d.labels.isEmpty()) vals = d.labels;
+                    else if (d.fmt && d.max - d.min <= 20)
+                        for (int v = d.min; v <= d.max; ++v) { auto t = d.fmt (v); if (t.isNotEmpty() && t != "ms" && t != juce::String (v)) vals.add (t); }
+                    if (vals.size() == d.max - d.min + 1) po->setProperty ("values", vals.joinIntoString ("|"));
+                    params.add (juce::var (po));
+                }
+                ao->setProperty ("params", params);
+                algsOut.add (juce::var (ao));
+            }
+        }
+        juce::File (juce::String (argv[2])).replaceWithText (juce::JSON::toString (juce::var (algsOut)));
+        return 0;
+    }
     if (argc > 1 && juce::String (argv[1]) == "--check-card")
     {
         // loads every multisample folder and wavetable on the SD card (EX_SD_ROOT or the default) and reports problems

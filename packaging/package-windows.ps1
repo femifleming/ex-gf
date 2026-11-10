@@ -16,6 +16,6 @@ foreach ($t in "EXMultisample", "EXPolyWavetable", "EXPolyFM", "EXPolyExciter") 
   Copy-Item -Recurse "$A\VST3\*.vst3" "$Stage\VST3\"
   Copy-Item "$A\Standalone\*.exe" "$Stage\Apps\"
 }
-Copy-Item packaging\windows\install.ps1, packaging\INSTALL.txt $Stage
+Copy-Item packaging\windows\install.ps1, packaging\INSTALL.txt, docs\ex-girlfriend-manual.pdf $Stage
 Compress-Archive -Force -Path $Stage -DestinationPath "dist\$Name.zip"
 (Get-FileHash "dist\$Name.zip" -Algorithm SHA256).Hash

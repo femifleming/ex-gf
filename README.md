@@ -62,7 +62,7 @@ This puts VST3 in `~/.vst3`, LV2 in `~/.lv2` and the apps in `~/.local/bin`, wit
 Download **EX-SD-Card.zip** from the release and unzip it into your Music folder, so you get `Music/EX SD Card`. Or choose any folder with the **SD** button. It contains 18 multisampled instruments, 38 wavetables, 5 exciter tables, DX7 banks and tuning files, all free (CC0 / CC-BY / MIT). See `CREDITS.txt` inside for sources and licences.
 
 ## Using it
-See **[docs/INSTRUCTIONS.md](docs/INSTRUCTIONS.md)** for the full guide. The short version:
+📖 **[PDF manual](docs/ex-girlfriend-manual.pdf)** (also attached to each release). The same material is in **[docs/INSTRUCTIONS.md](docs/INSTRUCTIONS.md)** for the full guide. The short version:
 - **Lists:** click a folder, wavetable, bank or voice to load it.
 - **Parameter tiles:** drag up/down or use the mouse wheel. Hold shift for fine steps, double-click to reset. Tiles with a ▾ open a list of choices.
 - **Display:** the wheel moves through parameters and shift+wheel changes the value. ↑↓ / ←→ / Enter / Esc work like the module's P and V encoders.
@@ -78,6 +78,7 @@ build/EXTest_artefacts/Release/EXTest out          # offline tests
 build/EXTest_artefacts/Release/EXTest --host build/*_artefacts/Release/VST3/*.vst3   # load the plug-ins like a DAW
 ```
 Options: `-DEX_COPY_AFTER_BUILD=ON` installs into your plug-in folders, and `-DEX_BUILD_TESTS=OFF` skips the test tool.
+Manual: `EXTest --dump-params params.json && python3 tools/make_manual.py params.json docs/ex-girlfriend-manual.pdf` (needs `pip install reportlab pillow`).
 Release packages: `packaging/package-macos.sh`, `packaging/package-linux.sh`, `packaging/package-windows.ps1`.
 On Linux you need: `libasound2-dev libjack-jackd2-dev libfreetype6-dev libfontconfig1-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libxi-dev libgl1-mesa-dev`.
 
