@@ -1,4 +1,4 @@
-EX Suite - installation
+ex-girlfriend - installation
 =======================
 
 macOS:   double-click install.command (or use the .pkg / Homebrew - see README).
@@ -11,4 +11,4 @@ Sample library (optional but recommended): download EX-SD-Card.zip from the same
 it into your Music folder so you get "Music/EX SD Card". Any folder can be used - choose it from the
 SD button inside the plug-ins (a real disting EX MicroSD card works too).
 
-Full instructions: https://github.com/femifleming/ex-suite/blob/main/docs/INSTRUCTIONS.md
+Full instructions: https://github.com/femifleming/ex-girlfriend/blob/main/docs/INSTRUCTIONS.md

@@ -19,8 +19,19 @@ struct SdCard
         if (! pf)
         {
             juce::PropertiesFile::Options o;
-            o.applicationName = "EX Suite"; o.filenameSuffix = "settings"; o.folderName = "EX Suite";
+            o.applicationName = "ex-girlfriend"; o.filenameSuffix = "settings"; o.folderName = "ex-girlfriend";
             o.osxLibrarySubFolder = "Application Support";
+            // one-time migration from the pre-release name ("EX Suite")
+            auto newDir = o.getDefaultFile().getParentDirectory();
+            juce::PropertiesFile::Options old = o;
+            old.applicationName = "EX Suite"; old.folderName = "EX Suite";
+            auto oldDir = old.getDefaultFile().getParentDirectory();
+            if (! newDir.isDirectory() && oldDir.isDirectory())
+            {
+                oldDir.copyDirectoryTo (newDir);
+                auto oldSettings = newDir.getChildFile (old.getDefaultFile().getFileName());
+                if (oldSettings.existsAsFile()) oldSettings.moveFileTo (o.getDefaultFile());
+            }
             pf = std::make_unique<juce::PropertiesFile> (o);
         }
         return *pf;

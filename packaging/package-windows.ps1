@@ -3,11 +3,11 @@
 param([string]$Version = "")
 $ErrorActionPreference = "Stop"
 Set-Location (Join-Path $PSScriptRoot "..")
-if (-not $Version) { $Version = ((Select-String -Path CMakeLists.txt -Pattern 'project\(EXSuite VERSION ([0-9.]+)').Matches[0].Groups[1].Value) }
+if (-not $Version) { $Version = ((Select-String -Path CMakeLists.txt -Pattern 'project\(ExGirlfriend VERSION ([0-9.]+)').Matches[0].Groups[1].Value) }
 $Build = "build-release"
 cmake -B $Build -DEX_COPY_AFTER_BUILD=OFF -DEX_BUILD_TESTS=ON
 cmake --build $Build --config Release --parallel
-$Name = "EX-Suite-$Version-Windows-x64"
+$Name = "ex-girlfriend-$Version-Windows-x64"
 $Stage = "dist\$Name"
 if (Test-Path $Stage) { Remove-Item -Recurse -Force $Stage }
 New-Item -ItemType Directory -Force -Path "$Stage\VST3", "$Stage\Apps" | Out-Null

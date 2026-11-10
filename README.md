@@ -1,4 +1,4 @@
-# EX Suite
+# ex-girlfriend
 
 Four instruments modelled on algorithms of the Expert Sleepers **disting EX** Eurorack module. Each one comes as a **VST3**, an **AU** (macOS), an **LV2** (Linux) and a **standalone app**, for **macOS, Windows and Linux**:
 
@@ -27,30 +27,30 @@ The whole interface is drawn as one white-on-black pixel display in the module's
 
 ## Install
 
-Releases: **https://github.com/femifleming/ex-suite/releases**
+Releases: **https://github.com/femifleming/ex-girlfriend/releases**
 
 ### macOS - Homebrew
 ```sh
-brew tap femifleming/ex-suite https://github.com/femifleming/ex-suite
-brew install --cask ex-suite            # apps + VST3 + AU
-brew install --cask ex-suite-sd-card    # optional: the free sample library -> ~/Music/EX SD Card
+brew tap femifleming/ex-girlfriend https://github.com/femifleming/ex-girlfriend
+brew install --cask ex-girlfriend            # apps + VST3 + AU
+brew install --cask ex-girlfriend-sd-card    # optional: the free sample library -> ~/Music/EX SD Card
 ```
 
 ### macOS / Linux - Homebrew from source
 ```sh
-brew tap femifleming/ex-suite https://github.com/femifleming/ex-suite
-brew install ex-suite                   # builds from source; `brew info ex-suite` shows where the plug-ins went
+brew tap femifleming/ex-girlfriend https://github.com/femifleming/ex-girlfriend
+brew install ex-girlfriend                   # builds from source; `brew info ex-girlfriend` shows where the plug-ins went
 ```
 
 ### macOS (download)
-Download `EX-Suite-<version>-macOS.zip`, unzip it and double-click **install.command**. Or run `EX-Suite-<version>-macOS.pkg`, then right-click → Open, because the builds aren't notarised.
+Download `ex-girlfriend-<version>-macOS.zip`, unzip it and double-click **install.command**. Or run `ex-girlfriend-<version>-macOS.pkg`, then right-click → Open, because the builds aren't notarised.
 
 ### Windows
-Download `EX-Suite-<version>-Windows-x64.zip`, unzip it, right-click **install.ps1** → *Run with PowerShell* (as administrator). VST3 plug-ins go to `C:\Program Files\Common Files\VST3`, and the apps go in the Start menu under **EX Suite**.
+Download `ex-girlfriend-<version>-Windows-x64.zip`, unzip it, right-click **install.ps1** → *Run with PowerShell* (as administrator). VST3 plug-ins go to `C:\Program Files\Common Files\VST3`, and the apps go in the Start menu under **ex-girlfriend**.
 
 ### Linux
 ```sh
-tar xzf EX-Suite-<version>-Linux-x86_64.tar.gz && cd EX-Suite-*-Linux-* && ./install.sh
+tar xzf ex-girlfriend-<version>-Linux-x86_64.tar.gz && cd ex-girlfriend-*-Linux-* && ./install.sh
 ```
 This puts VST3 in `~/.vst3`, LV2 in `~/.lv2` and the apps in `~/.local/bin`, with menu entries.
 
@@ -67,7 +67,7 @@ See **[docs/INSTRUCTIONS.md](docs/INSTRUCTIONS.md)** for the full guide. The sho
 
 ## Build from source
 ```sh
-git clone --recursive https://github.com/femifleming/ex-suite && cd ex-suite
+git clone --recursive https://github.com/femifleming/ex-girlfriend && cd ex-girlfriend
 cmake -B build -DCMAKE_BUILD_TYPE=Release        # add -G Ninja if you have it
 cmake --build build --config Release
 build/EXTest_artefacts/Release/EXTest out          # offline tests
