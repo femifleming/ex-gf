@@ -4,10 +4,10 @@ cask "ex-girlfriend" do
 
   url "https://github.com/femifleming/ex-girlfriend/releases/download/v#{version}/ex-girlfriend-#{version}-macOS.zip"
   name "ex-girlfriend"
-  desc "disting EX-style instruments: multisample + auto-sampler, poly wavetable, poly FM, poly exciter"
+  desc "Disting EX-style multisample, wavetable, FM and exciter instruments"
   homepage "https://github.com/femifleming/ex-girlfriend"
 
-  depends_on macos: ">= :big_sur"
+  depends_on :macos
 
   plugins = ["EX Multisample", "EX Poly Wavetable", "EX Poly FM", "EX Poly Exciter"]
   plugins.each do |p|
@@ -17,13 +17,24 @@ cask "ex-girlfriend" do
   end
 
   # the builds are ad-hoc signed (not notarised): clear the download quarantine so they open/load
-  postflight do
-    paths = plugins.flat_map do |p|
-      ["#{appdir}/#{p}.app",
-       File.expand_path("~/Library/Audio/Plug-Ins/VST3/#{p}.vst3"),
-       File.expand_path("~/Library/Audio/Plug-Ins/Components/#{p}.component")]
-    end
-    system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", *paths], must_succeed: false
+  postflight_steps do
+    run "/usr/bin/xattr",
+        args:         [
+          "-dr", "com.apple.quarantine",
+          "{{appdir}}/EX Multisample.app",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/VST3/EX Multisample.vst3",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/Components/EX Multisample.component",
+          "{{appdir}}/EX Poly Wavetable.app",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/VST3/EX Poly Wavetable.vst3",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/Components/EX Poly Wavetable.component",
+          "{{appdir}}/EX Poly FM.app",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/VST3/EX Poly FM.vst3",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/Components/EX Poly FM.component",
+          "{{appdir}}/EX Poly Exciter.app",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/VST3/EX Poly Exciter.vst3",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/Components/EX Poly Exciter.component"
+        ],
+        must_succeed: false
   end
 
   zap trash: "~/Library/Application Support/ex-girlfriend"

@@ -4,7 +4,7 @@ cask "ex-girlfriend-sd-card" do
 
   url "https://github.com/femifleming/ex-girlfriend/releases/download/v#{version}/EX-SD-Card.zip"
   name "ex-girlfriend SD card"
-  desc "Free multisamples, wavetables, exciters and DX7 banks for ex-girlfriend (disting EX format)"
+  desc "Free sample library (multisamples, wavetables, exciters) for ex-girlfriend"
   homepage "https://github.com/femifleming/ex-girlfriend"
 
   artifact "EX SD Card", target: "~/Music/EX SD Card"

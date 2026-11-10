@@ -67,6 +67,6 @@ class ExGirlfriend < Formula
   end
 
   test do
-    assert_predicate lib/"vst3/EX Poly FM.vst3", :exist?
+    assert_path_exists lib/"vst3/EX Poly FM.vst3"
   end
 end

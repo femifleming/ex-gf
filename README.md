@@ -32,6 +32,7 @@ Releases: **https://github.com/femifleming/ex-girlfriend/releases**
 ### macOS - Homebrew
 ```sh
 brew tap femifleming/ex-girlfriend https://github.com/femifleming/ex-girlfriend
+brew trust femifleming/ex-girlfriend         # Homebrew 7+ asks you to trust third-party taps
 brew install --cask ex-girlfriend            # apps + VST3 + AU
 brew install --cask ex-girlfriend-sd-card    # optional: the free sample library -> ~/Music/EX SD Card
 ```
@@ -39,6 +40,7 @@ brew install --cask ex-girlfriend-sd-card    # optional: the free sample library
 ### macOS / Linux - Homebrew from source
 ```sh
 brew tap femifleming/ex-girlfriend https://github.com/femifleming/ex-girlfriend
+brew trust femifleming/ex-girlfriend
 brew install ex-girlfriend                   # builds from source; `brew info ex-girlfriend` shows where the plug-ins went
 ```
 
