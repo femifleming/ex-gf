@@ -1,0 +1,91 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: macOS, os: macos-14 }
+          - { name: Linux, os: ubuntu-22.04 }
+          - { name: Windows, os: windows-2022 }
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libasound2-dev libjack-jackd2-dev libfreetype6-dev libfontconfig1-dev \
+            libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev \
+            libgl1-mesa-dev libcurl4-openssl-dev xvfb
+
+      - name: macOS dependencies
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Package (macOS)
+        if: runner.os == 'macOS'
+        run: packaging/package-macos.sh
+
+      - name: Package (Linux)
+        if: runner.os == 'Linux'
+        run: packaging/package-linux.sh
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: packaging/package-windows.ps1
+
+      - name: Tests (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          build-release/EXTest_artefacts/Release/EXTest "$RUNNER_TEMP/ex-test"
+          build-release/EXTest_artefacts/Release/EXTest --host build-release/*_artefacts/Release/VST3/*.vst3 build-release/*_artefacts/Release/AU/*.component
+
+      - name: Tests (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          xvfb-run -a build-release/EXTest_artefacts/Release/EXTest "$RUNNER_TEMP/ex-test"
+          xvfb-run -a build-release/EXTest_artefacts/Release/EXTest --host build-release/*_artefacts/Release/VST3/*.vst3
+
+      - name: Tests (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          & "build-release\EXTest_artefacts\Release\EXTest.exe" "$env:RUNNER_TEMP\ex-test"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $plugins = Get-ChildItem build-release -Recurse -Directory -Filter *.vst3 | Where-Object { $_.FullName -match '_artefacts\\Release\\VST3\\[^\\]+\.vst3$' } | ForEach-Object { $_.FullName }
+          & "build-release\EXTest_artefacts\Release\EXTest.exe" --host @plugins
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EX-Suite-${{ matrix.name }}
+          path: |
+            dist/*.zip
+            dist/*.pkg
+            dist/*.tar.gz
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.zip
+            dist/*.pkg
+            dist/*.tar.gz

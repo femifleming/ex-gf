@@ -1,0 +1,14 @@
+EX Suite - installation
+=======================
+
+macOS:   double-click install.command (or use the .pkg / Homebrew - see README).
+         Apps go to ~/Applications, plug-ins to ~/Library/Audio/Plug-Ins/{VST3,Components}.
+Windows: right-click install.ps1 > Run with PowerShell (as administrator).
+         VST3 plug-ins go to C:\Program Files\Common Files\VST3, apps to the Start menu.
+Linux:   ./install.sh   (VST3 -> ~/.vst3, LV2 -> ~/.lv2, apps -> ~/.local/bin)
+
+Sample library (optional but recommended): download EX-SD-Card.zip from the same release and unzip
+it into your Music folder so you get "Music/EX SD Card". Any folder can be used - choose it from the
+SD button inside the plug-ins (a real disting EX MicroSD card works too).
+
+Full instructions: https://github.com/femifleming/ex-suite/blob/main/docs/INSTRUCTIONS.md
