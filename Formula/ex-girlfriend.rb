@@ -3,7 +3,7 @@ class ExGirlfriend < Formula
   homepage "https://github.com/femifleming/ex-girlfriend"
   url "https://github.com/femifleming/ex-girlfriend.git",
       tag:      "v1.0.0",
-      revision: "GIT_REVISION"
+      revision: "749b55b33943e99807cb135403e6550862d18b11"
   license "AGPL-3.0-only"
   head "https://github.com/femifleming/ex-girlfriend.git", branch: "main"
 

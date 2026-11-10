@@ -1,6 +1,6 @@
 cask "ex-girlfriend" do
   version "1.0.0"
-  sha256 "SHA_MACOS_ZIP"
+  sha256 "f0b1808fcda0dfda39316599f9c747eb45e55a921857ddaa508bfd52552e6feb"
 
   url "https://github.com/femifleming/ex-girlfriend/releases/download/v#{version}/ex-girlfriend-#{version}-macOS.zip"
   name "ex-girlfriend"
