@@ -55,7 +55,14 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           build-release/EXTest_artefacts/Release/EXTest "$RUNNER_TEMP/ex-test"
-          build-release/EXTest_artefacts/Release/EXTest --host build-release/*_artefacts/Release/VST3/*.vst3 build-release/*_artefacts/Release/AU/*.component
+          build-release/EXTest_artefacts/Release/EXTest --host build-release/*_artefacts/Release/VST3/*.vst3
+          # Audio Units are only discoverable once installed: install, re-register, host-test and auval them
+          mkdir -p ~/Library/Audio/Plug-Ins/Components
+          cp -R build-release/*_artefacts/Release/AU/*.component ~/Library/Audio/Plug-Ins/Components/
+          killall -9 AudioComponentRegistrar 2>/dev/null || true
+          sleep 3
+          build-release/EXTest_artefacts/Release/EXTest --host ~/Library/Audio/Plug-Ins/Components/EX*.component
+          for c in ExMs ExWt ExFm ExEx; do auval -v aumu $c Frkp | tail -2; auval -v aumu $c Frkp | grep -q "AU VALIDATION SUCCEEDED"; done
 
       - name: Tests (Linux)
         if: runner.os == 'Linux'
