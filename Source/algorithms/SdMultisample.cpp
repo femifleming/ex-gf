@@ -146,7 +146,7 @@ SdMultisample::SdMultisample (ExPlugin& p) : PolyAlgorithm (p, 3, "SD Multisampl
     add ("Gain", -40, 24, 0, "dB");                                     // 15
     add ("Saturation", 0, 1, 1, {}, { "Off", "On" });                   // 16
     add ("Sustain", 0, 1, 0, {}, { "Off", "On" });                      // 17
-    add ("Max voices", 1, 8, 8);                                        // 18
+    add ("Max voices", 1, 16, 16);                                        // 18
     add ("Bend range", 0, 48, 2);                                       // 19
     add ("Pitch bend input", 0, 6, 0);                                  // 20
     for (int i = 1; i <= 8; ++i) add ("Voice " + juce::String (i) + " detune", -100, 100, 0, "cents"); // 21-28
@@ -184,6 +184,7 @@ SdMultisample::SdMultisample (ExPlugin& p) : PolyAlgorithm (p, 3, "SD Multisampl
     add ("Arp reset input", 0, 6, 0);                                                                  // 71
     add ("Gate offset", 0, 496, 0);                                                                    // 72
     add ("Round robin mode", 0, 3, 0, {}, { "Sequential", "Random", "Random2", "Random3" });            // 73
+    for (int i = 9; i <= 16; ++i) add ("Voice " + juce::String (i) + " detune", -100, 100, 0, "cents"); // 74-81
 
     engine.startVoice = [this] (const PolyNoteEngine::VoiceStart& s) { startVoice (s); };
     engine.releaseVoice = [this] (int vi)
@@ -198,7 +199,7 @@ SdMultisample::SdMultisample (ExPlugin& p) : PolyAlgorithm (p, 3, "SD Multisampl
     sections = {
         { "SOUND", { 15, 16, 18, 73, 67, 50 } },
         { "ENV", { 8, 9, 10, 11 } },
-        { "TUNE", { 12, 13, 14, 19, 40, 41, 21, 22, 23, 24, 25, 26, 27, 28 } },
+        { "TUNE", { 12, 13, 14, 19, 40, 41, 21, 22, 23, 24, 25, 26, 27, 28, 74, 75, 76, 77, 78, 79, 80, 81 } },
         { "CHORD", { 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 57, 58 } },
         { "FX", { 51, 53, 54, 52, 55, 56 } },
         { "KEYS", { 17, 69, 70, 44, 45, 46, 47, 48, 49 } },
@@ -390,7 +391,7 @@ void SdMultisample::renderVoices (float* const* out, int start, int n)
         auto& v = voices[vi];
         if (! v.active) { voiceLevel[vi] = 0.0f; continue; }
         const WavData& w = *v.wav;
-        const float detune = (float) pv (21 + vi) * 0.01f;
+        const float detune = (float) pv (vi < 8 ? 21 + vi : 74 + vi - 8) * 0.01f;
         const double ratio = std::pow (2.0, (v.pitch + bendSemis + detune - (float) v.zone->natural) / 12.0) * w.sampleRate / sr;
         int64_t ls = 0, le = w.frames;
         if (w.hasLoop()) { ls = w.loopStart; le = w.loopEnd; }

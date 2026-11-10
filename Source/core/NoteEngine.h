@@ -102,7 +102,7 @@ inline std::vector<int> buildChord (int note, const ChordSettings& cs)
 class PolyNoteEngine
 {
 public:
-    static constexpr int kMaxVoices = 8;
+    static constexpr int kMaxVoices = 16;
 
     struct VoiceStart
     {
@@ -121,7 +121,7 @@ public:
     std::function<bool (int voice)> voiceSounding; // still producing sound?
 
     // ----- config (update every block) -----
-    int maxVoices = 8, unison = 1;
+    int maxVoices = kMaxVoices, unison = 1;
     float unisonDetuneCents = 10.0f;
     int transpose = 0;          // semitones (octave*12 + transpose)
     float fineCents = 0;

@@ -159,15 +159,18 @@ public:
     // voice numbers line: "-- 62 76 ..." with envelope bars
     void drawVoiceLine (Oled& o, bool showNotes = true)
     {
-        for (int v = 0; v < PolyNoteEngine::kMaxVoices; ++v)
+        // up to 8 voices: note numbers, 16 px apart; more: 16 narrow level bars
+        const bool wide = engine.maxVoices <= 8;
+        const int n = wide ? 8 : PolyNoteEngine::kMaxVoices, step = 128 / n;
+        for (int v = 0; v < n; ++v)
         {
-            int x = v * 16;
+            int x = v * step;
             int note = engine.voiceNote[v];
             float lvl = voiceLevel[v].load();
-            if (note < 0 || (lvl <= 0.0005f && ! engine.voiceGate[v])) { o.text (x, 24, "--"); continue; }
-            if (showNotes) o.text (x, 24, juce::String (note).paddedLeft ('0', 2).substring (0, 2));
-            int h = juce::jlimit (0, 8, (int) std::ceil (lvl * 8.0f));
-            o.invertRect (x, 32 - h, 11, h);
+            if (note < 0 || (lvl <= 0.0005f && ! engine.voiceGate[v])) { o.text (wide ? x : x + 1, 24, wide ? "--" : "-"); continue; }
+            if (showNotes && wide) o.text (x, 24, juce::String (note).paddedLeft ('0', 2).substring (0, 2));
+            int h = juce::jlimit (wide ? 0 : 1, 8, (int) std::ceil (lvl * 8.0f));
+            o.invertRect (x, 32 - h, wide ? 11 : 7, h);
         }
     }
 

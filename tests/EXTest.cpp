@@ -328,7 +328,6 @@ int main (int argc, char** argv)
         st = render (*p, 2.5, chordEvents ({ 60 }, 0.05, 1.5), &cap);
         writeWav (out.getChildFile (juce::String (kind) + "_triad.wav"), cap);
         report (juce::String (kind) + " chord generator", st);
-        int maxN = 0; for (int v = 0; v < 8; ++v) maxN += p->alg().params.empty() ? 0 : 0;
         a.set (chordEnable, 0);
         snapshot (*p, out.getChildFile (juce::String (kind) + "_ui.png"));
         // display pages

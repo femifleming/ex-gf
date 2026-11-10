@@ -7,7 +7,7 @@ if(APPLE)
     endif()
 endif()
 
-project(EXGF VERSION 1.0.1 LANGUAGES C CXX)
+project(EXGF VERSION 1.0.2 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -68,11 +68,11 @@ endfunction()
 
 ex_plugin(EXMultisample "EX Multisample" ExMs "SD Multisample + WAV Recorder auto-sampler"
     "Source/plugins/MultisamplePlugin.cpp;Source/algorithms/SdMultisample.cpp;Source/algorithms/WavRecorder.cpp" TRUE)
-ex_plugin(EXPolyWavetable "EX Poly Wavetable" ExWt "8 voice wavetable synthesizer"
+ex_plugin(EXPolyWavetable "EX Poly Wavetable" ExWt "16 voice wavetable synthesizer"
     "Source/plugins/PolyWavetablePlugin.cpp;Source/algorithms/PolyWavetable.cpp" FALSE)
-ex_plugin(EXPolyFM "EX Poly FM" ExFm "8 voice 4 timbre DX7-compatible FM synthesizer"
+ex_plugin(EXPolyFM "EX Poly FM" ExFm "16 voice 4 timbre DX7-compatible FM synthesizer"
     "Source/plugins/PolyFMPlugin.cpp;Source/algorithms/PolyFM.cpp;Source/algorithms/PlaitsBanks.cpp;${PLAITS_SOURCES}" TRUE)
-ex_plugin(EXPolyExciter "EX Poly Exciter" ExEx "8 voice exciter/resonator synthesizer"
+ex_plugin(EXPolyExciter "EX Poly Exciter" ExEx "16 voice exciter/resonator synthesizer"
     "Source/plugins/PolyExciterPlugin.cpp;Source/algorithms/PolyExciter.cpp" FALSE)
 
 if(EX_BUILD_TESTS)

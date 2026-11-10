@@ -258,11 +258,13 @@ void ExEditor::sideBoxes()
     yy += 11;
     if (auto* pa = dynamic_cast<PolyAlgorithm*> (&plugin.alg()))
     {
-        const int rows = hasTimbre ? 2 : 4, perRow = 8 / rows, cellW = (w - 4 + 3) / perRow - 3;
+        const int nv = PolyNoteEngine::kMaxVoices;
+        const int rows = hasTimbre ? 2 : 4, perRow = nv / rows, gap = perRow > 4 ? 2 : 3, cellW = (w - 4 + gap) / perRow - gap;
         const int rowH = (y + L::topH - 2 - yy) / rows;
-        for (int v = 0; v < 8; ++v)
+        const bool names = cellW >= 3 * 6 + 3; // room for "C#4"; otherwise the MIDI note number
+        for (int v = 0; v < nv; ++v)
         {
-            int cx = x + 2 + (v % perRow) * (cellW + 3), cy = yy + (v / perRow) * rowH;
+            int cx = x + 2 + (v % perRow) * (cellW + gap), cy = yy + (v / perRow) * rowH;
             int note = pa->engine.voiceNote[v];
             float lvl = pa->voiceLevel[v].load();
             bool on = note >= 0 && (lvl > 0.0005f || pa->engine.voiceGate[v]);
@@ -271,7 +273,8 @@ void ExEditor::sideBoxes()
             {
                 int fw = juce::jlimit (0, cellW - 2, (int) std::round (lvl * (float) (cellW - 2)));
                 cv.fill (cx + 1, cy + 1, fw, rowH - 4, 6);
-                cv.text (cx + 2, cy + (rowH - 2 - 7) / 2, noteName (note), 15, (cellW - 3) / 6);
+                if (names) cv.text (cx + 2, cy + (rowH - 2 - 7) / 2, noteName (note), 15, (cellW - 3) / 6);
+                else cv.text (cx + 1, cy + (rowH - 2 - 7) / 2, juce::String (note).paddedLeft ('0', 2).substring (0, 2), 15);
             }
         }
     }

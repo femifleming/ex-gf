@@ -16,7 +16,7 @@ from reportlab.platypus import (BaseDocTemplate, PageTemplate, Frame, Paragraph,
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PARAMS = json.load(open(sys.argv[1]))
 OUT = sys.argv[2]
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 
 # ------------------------------------------------------------------ pixel font (from Source/core/ExFont.h)
 FONT = {}
@@ -288,11 +288,11 @@ def story(doc):
                "module's look: the whole window is one white-on-black pixel display in the module's own 5×7 font."))
     s.append(table([
         ["Plug-in", "Algorithm(s)", "In short"],
-        ["EX Multisample", "3 - SD Multisample<br/>5 - WAV Recorder", "8-voice, 3-timbre sample player with velocity layers, round robins, chords, arpeggiator, EQ and delay; "
+        ["EX Multisample", "3 - SD Multisample<br/>5 - WAV Recorder", "16-voice, 3-timbre sample player with velocity layers, round robins, chords, arpeggiator, EQ and delay; "
                                                                         "plus a recorder with an <b>auto-sampler</b> that samples any MIDI/CV instrument into a ready-to-play folder."],
-        ["EX Poly Wavetable", "10 - Poly Wavetable", "8-voice wavetable synth: 2 envelopes, filter, LFO, unison, Juno-style chorus and delay. Imports WaveEdit banks."],
-        ["EX Poly FM", "23 - Poly FM", "8-voice, 4-timbre 6-operator FM (the Plaits engine). Loads DX7 .syx banks; DX7 editors can edit it over SysEx."],
-        ["EX Poly Exciter", "13 - Poly Exciter", "8-voice exciter/resonator synth: plucked, struck and bowed-like sounds from short exciter samples or live input."],
+        ["EX Poly Wavetable", "10 - Poly Wavetable", "16-voice wavetable synth: 2 envelopes, filter, LFO, unison, Juno-style chorus and delay. Imports WaveEdit banks."],
+        ["EX Poly FM", "23 - Poly FM", "16-voice, 4-timbre 6-operator FM (the Plaits engine). Loads DX7 .syx banks; DX7 editors can edit it over SysEx."],
+        ["EX Poly Exciter", "13 - Poly Exciter", "16-voice exciter/resonator synth: plucked, struck and bowed-like sounds from short exciter samples or live input."],
     ], [32 * mm, 36 * mm, 102 * mm]))
     s.append(Spacer(1, 6))
     s.append(P("Each instrument is available as a <b>VST3</b> (all platforms), <b>Audio Unit</b> (macOS), <b>LV2</b> (Linux) and a "
@@ -312,16 +312,16 @@ def story(doc):
     s.append(P("Homebrew 7 asks you to <i>trust</i> third-party taps once. To build from source instead (macOS or Linux): "
                "<font face='Courier'>brew install ex-gf</font>, then follow the link instructions it prints."))
     s.append(H2("MACOS - DOWNLOAD"))
-    s += B(["<b>EX-GF-1.0.1-macOS.zip</b>: unzip and double-click <b>install.command</b> - apps go to ~/Applications, plug-ins to "
+    s += B(["<b>EX-GF-1.0.2-macOS.zip</b>: unzip and double-click <b>install.command</b> - apps go to ~/Applications, plug-ins to "
             "~/Library/Audio/Plug-Ins/VST3 and /Components.",
-            "<b>EX-GF-1.0.1-macOS.pkg</b>: installs for all users (right-click → Open the first time).",
+            "<b>EX-GF-1.0.2-macOS.pkg</b>: installs for all users (right-click → Open the first time).",
             "The builds are universal (Apple silicon + Intel) but not notarised. If macOS or your DAW refuses to open them, run:"])
     s.append(C("xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/EX*.vst3 \\\n    ~/Library/Audio/Plug-Ins/Components/EX*.component ~/Applications/EX*.app"))
     s.append(H2("WINDOWS"))
-    s.append(P("Unzip <b>EX-GF-1.0.1-Windows-x64.zip</b>, right-click <b>install.ps1</b> → <i>Run with PowerShell</i> (as administrator). "
+    s.append(P("Unzip <b>EX-GF-1.0.2-Windows-x64.zip</b>, right-click <b>install.ps1</b> → <i>Run with PowerShell</i> (as administrator). "
                "VST3 plug-ins go to C:\\Program Files\\Common Files\\VST3; the apps appear in the Start menu under <b>EX-GF</b>."))
     s.append(H2("LINUX"))
-    s.append(C("tar xzf EX-GF-1.0.1-Linux-x86_64.tar.gz\ncd ex-gf-1.0.1-Linux-x86_64 && ./install.sh"))
+    s.append(C("tar xzf EX-GF-1.0.2-Linux-x86_64.tar.gz\ncd ex-gf-1.0.2-Linux-x86_64 && ./install.sh"))
     s.append(P("VST3 → ~/.vst3, LV2 → ~/.lv2, apps → ~/.local/bin with desktop menu entries."))
     s.append(H2("THE SAMPLE LIBRARY"))
     s.append(P("Download <b>EX-SD-Card.zip</b> and unzip it into your <b>Music</b> folder so you have <b>Music/EX SD Card</b> (the default "
@@ -343,7 +343,7 @@ def story(doc):
         ["", "Area", "What it does"],
         ["", "Top bar", "<b>SAVE</b> / <b>LOAD</b> presets (stored on the SD card), <b>SD</b> chooses the card folder, <b>MIDI</b> channels, "
                         "<b>PANIC</b> (all notes off), <b>MENU</b> (every option of the module's menus). In EX Multisample the centre holds the algorithm tabs."],
-        ["1", "Timbre / voices", "Timbre buttons (multi-timbral plug-ins) choose which timbre the lists edit. The 8 cells show each voice's note and level."],
+        ["1", "Timbre / voices", "Timbre buttons (multi-timbral plug-ins) choose which timbre the lists edit. The 16 cells show each voice's note and level."],
         ["2", "Module display", "The disting EX's own 128×32 screen: current parameter, live voices, levels, auto-sampler progress. "
                                 "Mouse wheel = parameter, shift+wheel = value; ↑↓ and ←→ act like the P and V encoders, Enter = push P (menu), Esc = push V."],
         ["3", "Actions", "Buttons for the algorithm: RECORD, PLAY, AUTO, TEST, IMPORT, WAVEEDIT, NOTES OFF, RESCAN …"],
@@ -410,7 +410,7 @@ def story(doc):
     s.append(shot("ms"))
     s.append(Spacer(1, 6))
     s.append(Inverted("3 - SD MULTISAMPLE"))
-    s.append(P("An 8-voice, 3-timbre sample instrument. Choose a folder in the left list; the right list shows its samples - click one "
+    s.append(P("A 16-voice, 3-timbre sample instrument. Choose a folder in the left list; the right list shows its samples - click one "
                "to hear it. The display's top line shows the file, natural note and switch point of the highest playing voice."))
     s += B(["<b>Timbres</b>: the TIMBRE buttons pick which timbre the folder list sets. Timbres 2 and 3 can follow timbre 1 or use their own "
             "folders, and each has its own note range and arpeggiator.",
@@ -464,10 +464,10 @@ def story(doc):
     s.append(H1("EX POLY WAVETABLE"))
     s.append(shot("wt"))
     s.append(Spacer(1, 6))
-    s.append(P("An 8-voice wavetable synthesizer. Pick a wavetable in the left list; the right list shows its waves - click one to jump "
+    s.append(P("A 16-voice wavetable synthesizer. Pick a wavetable in the left list; the right list shows its waves - click one to jump "
                "the <i>Wave offset</i> to it. The position can also follow velocity, pitch, both envelopes and the LFO, and <i>Wave spread</i> "
                "gives every voice a different position. Each voice has two envelopes (with curve shapes; envelope 2's sustain can be negative), "
-               "a state-variable filter (low/band/high pass) and an LFO; unison stacks up to 8 voices per note."))
+               "a state-variable filter (low/band/high pass) and an LFO; unison stacks up to 8 of the 16 voices per note."))
     s += B(["<b>OSC</b> wave offset/spread, unison, voices, gain · <b>ENV 1</b>, <b>ENV 2</b> · <b>FILTER</b> type, cutoff (as a MIDI note), resonance and "
             "modulation · <b>MOD</b> routings and LFO speed/retrigger/spread · <b>CHORD</b> · <b>FX</b> Juno-style chorus I/II, delay, output mode "
             "(<i>Per voice</i> sends voices to Out 1-4) · <b>KEYS</b> tuning, sustain, trigger mode (gated, drone, triggered), Scala.",
@@ -486,7 +486,7 @@ def story(doc):
     s.append(H1("EX POLY FM"))
     s.append(shot("fm"))
     s.append(Spacer(1, 6))
-    s.append(P("An 8-voice, 4-timbre FM synthesizer using the six-operator engine of Mutable Instruments Plaits - the same engine the "
+    s.append(P("A 16-voice, 4-timbre FM synthesizer using the six-operator engine of Mutable Instruments Plaits - the same engine the "
                "disting EX uses. Banks (left list) are DX7 32-voice SysEx files from the card's <i>FMSYX</i> folder; the right list shows the "
                "bank's voices by name. The TIMBRE buttons choose which timbre the lists set; timbres 2-4 can follow timbre 1."))
     s += B(["<b>T1 … T4</b>: output, gain, pan, <i>Brightness</i> (modulator depth) and <i>Env scale</i> (envelope times) per timbre.",
@@ -507,7 +507,7 @@ def story(doc):
     s.append(H1("EX POLY EXCITER"))
     s.append(shot("ex"))
     s.append(Spacer(1, 6))
-    s.append(P("An 8-voice synthesizer that excites a resonating string with a short burst of sound - plucked, struck, scraped or bowed. "
+    s.append(P("A 16-voice synthesizer that excites a resonating string with a short burst of sound - plucked, struck, scraped or bowed. "
                "The left list holds exciter tables (<i>Internal</i>, or tables from the card's <i>exciters</i> folder); the right list shows "
                "the exciters in the table. Drum hits make great exciters: a kick for a soft tone, a snare for a sharp, noisy attack."))
     s.append(table([

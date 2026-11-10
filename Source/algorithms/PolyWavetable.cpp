@@ -157,7 +157,7 @@ PolyWavetable::PolyWavetable (ExPlugin& p) : PolyAlgorithm (p, 10, "Poly Wavetab
     add ("Wave input", 0, 6, 5);
     add ("Pitch bend input", 0, 6, 0);
     add ("Arp reset input", 0, 6, 0);
-    add ("Max voices", 1, 8, 8);
+    add ("Max voices", 1, 16, 16);
     add ("LFO retrigger", 0, 2, 0, {}, { "Poly", "Mono", "Off" });
     add ("LFO spread", 0, 90, 0, "deg");
     add ("Gate offset", 0, 496, 0);

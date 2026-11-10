@@ -102,7 +102,7 @@ PolyFM::PolyFM (ExPlugin& p) : PolyAlgorithm (p, 23, "Poly FM")
     add ("Output mode", 0, 2, 0, {}, { "Spread voice", "Spread voice 2", "Spread pitch" });       // 52
     add ("Output spread", -100, 100, 0, "%");                                                     // 53
     // 54-64: not listed in the manual's table - used here for voice/FX extras
-    add ("Max voices", 1, 8, 8);                                                                  // 54
+    add ("Max voices", 1, 16, 16);                                                                  // 54
     add ("Unison", 1, 8, 1);                                                                      // 55
     add ("Unison detune", 0, 100, 10, "cents");                                                   // 56
     add ("Chorus mode", 0, 2, 0, {}, { "Off", "I", "II" });                                       // 57

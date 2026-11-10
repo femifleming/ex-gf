@@ -248,6 +248,7 @@ std::unique_ptr<juce::XmlElement> ExPlugin::stateXml() const
     x->setAttribute ("mapL", mapL); x->setAttribute ("mapR", mapR);
     x->setAttribute ("potL", potValue[0]); x->setAttribute ("potR", potValue[1]);
     for (int t = 0; t < 4; ++t) x->setAttribute ("tch" + juce::String (t), timbreChannel[t]);
+    x->setAttribute ("voices", PolyNoteEngine::kMaxVoices);
     for (size_t i = 0; i < algs.size(); ++i)
     {
         auto& a = *algs[i];
@@ -273,6 +274,7 @@ void ExPlugin::restoreXml (const juce::XmlElement& x)
     mapL = x.getIntAttribute ("mapL", -1); mapR = x.getIntAttribute ("mapR", 0);
     potValue[0] = (float) x.getDoubleAttribute ("potL", 0.5); potValue[1] = (float) x.getDoubleAttribute ("potR", 0.5);
     for (int t = 0; t < 4; ++t) timbreChannel[t] = x.getIntAttribute ("tch" + juce::String (t), 0);
+    const int savedVoices = x.getIntAttribute ("voices", 8);
     for (auto* ax : x.getChildWithTagNameIterator ("ALG"))
     {
         int num = ax->getIntAttribute ("num");
@@ -295,6 +297,10 @@ void ExPlugin::restoreXml (const juce::XmlElement& x)
                     if (a.def (p).confirm) { a.applied[p] = a.pv (p); a.confirm (p); }
                 }
             }
+            // states saved when the limit was 8 voices: "all 8" becomes "all 16"
+            if (savedVoices < PolyNoteEngine::kMaxVoices)
+                for (int p = 1; p <= a.numParams(); ++p)
+                    if (a.def (p).name == "Max voices" && a.pv (p) == savedVoices) a.set (p, PolyNoteEngine::kMaxVoices);
             a.loadExtra (*ax);
         }
     }

@@ -4,10 +4,10 @@ Four instruments modelled on algorithms of the Expert Sleepers **disting EX** Eu
 
 | Plug-in | What it is |
 |---|---|
-| **EX Multisample** | *SD Multisample*: an 8-voice, 3-timbre sample player. It uses disting-format sample folders with velocity layers, round robins, loops, a chord generator, an arpeggiator, broken chords, EQ and delay. It also includes *WAV Recorder* with the **auto-sampler**, which plays any MIDI or CV instrument, records each note and writes a ready-to-play multisample folder. |
-| **EX Poly Wavetable** | An 8-voice wavetable synth with two envelopes, a filter, an LFO, unison, a Juno-style chorus and delay. It **imports WaveEdit banks**. |
-| **EX Poly FM** | An 8-voice, 4-timbre 6-operator FM synth built on the Plaits engine. It loads DX7 `.syx` banks and works with DX7 editors (e.g. Dexed) over SysEx. |
-| **EX Poly Exciter** | An 8-voice exciter/resonator synth with built-in exciters, exciters from the SD card or live input, and Strike, Scrape and Strum modes. |
+| **EX Multisample** | *SD Multisample*: a 16-voice, 3-timbre sample player. It uses disting-format sample folders with velocity layers, round robins, loops, a chord generator, an arpeggiator, broken chords, EQ and delay. It also includes *WAV Recorder* with the **auto-sampler**, which plays any MIDI or CV instrument, records each note and writes a ready-to-play multisample folder. |
+| **EX Poly Wavetable** | A 16-voice wavetable synth with two envelopes, a filter, an LFO, unison, a Juno-style chorus and delay. It **imports WaveEdit banks**. |
+| **EX Poly FM** | A 16-voice, 4-timbre 6-operator FM synth built on the Plaits engine. It loads DX7 `.syx` banks and works with DX7 editors (e.g. Dexed) over SysEx. |
+| **EX Poly Exciter** | A 16-voice exciter/resonator synth with built-in exciters, exciters from the SD card or live input, and Strike, Scrape and Strum modes. |
 
 The plug-ins use the same sample, wavetable, exciter and bank formats as the module. You can point them at a real disting EX MicroSD card, and anything they create (auto-sampled folders, imported wavetables) works on the module.
 

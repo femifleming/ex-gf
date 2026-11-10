@@ -106,7 +106,7 @@ PolyExciter::PolyExciter (ExPlugin& p) : PolyAlgorithm (p, 13, "Poly Exciter")
     defs.back().fmt = [] (int v) { return v == 0 ? juce::String ("None") : v == 1 ? juce::String ("In L") : v == 2 ? juce::String ("In R") : juce::String ("In L+R"); };
     add ("Pitch bend input", 0, 6, 0);                                    // 66
     add ("Arp reset input", 0, 6, 0);                                     // 67
-    add ("Max voices", 1, 8, 8);                                          // 68
+    add ("Max voices", 1, 16, 16);                                          // 68
     add ("LFO retrigger", 0, 1, 0, {}, { "Poly", "Off" });                 // 69
     add ("LFO spread", 0, 90, 0, "deg");                                  // 70
     add ("Gate offset", 0, 496, 0);                                       // 71
