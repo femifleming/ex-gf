@@ -37,11 +37,13 @@ namespace rings {
 
 
 const int16_t* lookup_table_int16_table[] = {
+  0,  // EX-GF: the table is empty; ISO C++ forbids zero-size arrays
 };
 
 
 
 const uint32_t* lookup_table_uint32_table[] = {
+  0,  // EX-GF: the table is empty; ISO C++ forbids zero-size arrays
 };
 
 const float lut_sine[] = {

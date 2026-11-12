@@ -4,4 +4,5 @@ https://github.com/pichenettes/stmlib (MIT licence - see LICENSE and the file he
 
 Only the DSP code and its lookup tables are included (no hardware drivers, UI or bootloader).
 One change was made for EX-GF: plaits/dsp/voice.h/.cc gained set_custom_fm_bank() and trigger_state(), so DX7 banks
-can be loaded from the SD card folder. plaits/user_data.h includes <cstdio>. Everything else is unmodified.
+can be loaded from the SD card folder. plaits/user_data.h includes <cstdio>; stmlib/stmlib.h defines away __attribute__ for MSVC; the two empty tables in
+rings/resources.cc got a null entry (zero-size arrays are not standard C++). Everything else is unmodified.
