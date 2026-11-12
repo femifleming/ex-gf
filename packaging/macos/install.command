@@ -9,5 +9,5 @@ for f in Applications/*.app; do rm -rf ~/Applications/"$(basename "$f")"; ditto 
 # the builds are not notarised: clear the download quarantine so macOS lets them load
 xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/EX\ *.vst3 ~/Library/Audio/Plug-Ins/Components/EX\ *.component ~/Applications/EX\ *.app 2>/dev/null || true
 killall -9 AudioComponentRegistrar 2>/dev/null || true
-echo "Installed EX-GF. Apps are in ~/Applications; rescan plug-ins in your DAW."
+echo "Installed EX-GF (9 plug-ins). Apps are in ~/Applications; rescan plug-ins in your DAW."
 echo "Optional: download EX-SD-Card.zip from the release page and unzip it into ~/Music (giving ~/Music/EX SD Card)."

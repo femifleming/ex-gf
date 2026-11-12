@@ -10,7 +10,7 @@ cmake --build "$BUILD" --config Release
 NAME="EX-GF-$VERSION-macOS"
 STAGE="dist/$NAME"
 rm -rf "$STAGE" "dist/$NAME.zip" "dist/$NAME.pkg" && mkdir -p "$STAGE/VST3" "$STAGE/Components" "$STAGE/Applications"
-for t in EXMultisample EXPolyWavetable EXPolyFM EXPolyExciter; do
+for t in EXMultisample EXPolyWavetable EXPolyFM EXPolyExciter EXGranulator EXMultiFX EXResonator EXSpectralFreeze EXMacroOsc2; do
   A="$BUILD/${t}_artefacts/Release"
   ditto "$A/VST3/"*.vst3 "$STAGE/VST3/$(basename "$A/VST3/"*.vst3)"
   ditto "$A/AU/"*.component "$STAGE/Components/$(basename "$A/AU/"*.component)"

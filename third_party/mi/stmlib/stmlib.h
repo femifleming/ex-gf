@@ -25,6 +25,11 @@
 #ifndef STMLIB_STMLIB_H_
 #define STMLIB_STMLIB_H_
 
+// EX-GF: MSVC has no __attribute__
+#if defined(_MSC_VER) && !defined(__clang__)
+#define __attribute__(x)
+#endif
+
 #include <inttypes.h>
 #include <stddef.h>
 

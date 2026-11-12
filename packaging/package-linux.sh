@@ -10,7 +10,7 @@ cmake --build "$BUILD" --config Release
 NAME="EX-GF-$VERSION-Linux-$(uname -m)"
 STAGE="dist/$NAME"
 rm -rf "$STAGE" && mkdir -p "$STAGE/vst3" "$STAGE/lv2" "$STAGE/bin"
-for t in EXMultisample EXPolyWavetable EXPolyFM EXPolyExciter; do
+for t in EXMultisample EXPolyWavetable EXPolyFM EXPolyExciter EXGranulator EXMultiFX EXResonator EXSpectralFreeze EXMacroOsc2; do
   A="$BUILD/${t}_artefacts/Release"
   cp -r "$A/VST3/"*.vst3 "$STAGE/vst3/"
   cp -r "$A/LV2/"*.lv2 "$STAGE/lv2/"

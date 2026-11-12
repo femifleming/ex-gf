@@ -84,6 +84,12 @@ public:
     // drag & drop / import of files (e.g. wavetables); return true if handled
     virtual bool acceptsFileImport() const { return false; }
     virtual bool importFiles (const juce::StringArray& paths) { juce::ignoreUnused (paths); return false; }
+    virtual juce::String importHint() const { return "into the SD card's wavetables folder"; }
+    // activity cells for the top-left box (algorithms without the poly note engine)
+    struct Meter { bool on = false; float level = 0; juce::String label; };
+    virtual int numMeters() { return 0; }
+    virtual Meter meter (int index) { juce::ignoreUnused (index); return {}; }
+    virtual juce::String metersTitle() { return "VOICES"; }
 
     int numParams() const { return (int) defs.size(); }
     int pv (int n) const { return params[(size_t) n - 1]->get(); }   // 1-based parameter number
@@ -147,7 +153,7 @@ private:
 class ExPlugin : public juce::AudioProcessor, private juce::Timer
 {
 public:
-    struct Identity { juce::String product; bool midiOut = false; bool wantsInput = true; int numTimbreChannels = 1; };
+    struct Identity { juce::String product; bool midiOut = false; bool wantsInput = true; int numTimbreChannels = 1; bool midiIn = true; };
     explicit ExPlugin (Identity id);
     static inline bool rememberLastState = true;   // tests switch this off
     juce::File lastStateFile() const;
@@ -173,10 +179,10 @@ public:
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
-    bool acceptsMidi() const override { return true; }
+    bool acceptsMidi() const override { return identity.midiIn; }
     bool producesMidi() const override { return identity.midiOut; }
     bool isMidiEffect() const override { return false; }
-    double getTailLengthSeconds() const override { return 2.0; }
+    double getTailLengthSeconds() const override { return 4.0; }
     int getNumPrograms() override { return 1; }
     int getCurrentProgram() override { return 0; }
     void setCurrentProgram (int) override {}

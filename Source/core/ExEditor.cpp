@@ -83,8 +83,19 @@ juce::String ExEditor::shortName (juce::String s)
         { "Env -> ", "Env>" }, { "LFO -> ", "LFO>" }, { "Press -> ", "Press>" }, { "Playback gain", "Play gain" }, { "Playback file", "Play file" },
         { "AS Min velocity", "AS Min vel" }, { "AS Max velocity", "AS Max vel" }, { "AS Preview note", "AS Preview" }, { "Release damp", "Rel damp" },
         { "Voice transpose", "Voice transp" }, { "Pitch bend input", "Bend input" }, { "Break direction", "Break dir" },
+        { "Granulator gain", "Grain gain" }, { "Input feedback", "Input fdbk" }, { " enable", " on" }, { " opacity", " opac" },
+        { "Out delay ", "Dly " }, { "Pitch quantize", "Pitch quant" }, { "Effects routing", "FX routing" },
+        { "Reverb high damp", "Rev hi damp" }, { "Reverb mod speed", "Rev mod spd" }, { "Reverb mod depth", "Rev mod dep" },
+        { "Reverb early gain", "Rev early" }, { "Reverb diff gain", "Rev diffuse" }, { "Reverb low pass", "Rev low pass" },
+        { "Reverb input mix", "Rev in mix" }, { "Reverb input ", "Rev in " }, { "Reverb routing", "Rev routing" },
+        { " frequency", " freq" }, { "Pitch input mix", "Pitch in mix" }, { "Pitch input ", "Pitch in " }, { "Pitch feedback", "Pitch fdbk" },
+        { "Pitch shift delay", "Shift delay" }, { "Pitch shift (fine)", "Shift fine" }, { "Delay input mix", "Dly in mix" },
+        { "Delay input ", "Dly in " }, { "Delay mono-ize", "Dly mono-ize" }, { "Delay initial pan", "Dly init pan" },
+        { "Delay routing", "Dly routing" }, { "Freeze toggle", "Frz toggle" }, { "Freeze target", "Frz target" },
+        { "Low-pass gate", "LP gate" }, { "Share params", "Share set" },
     };
     for (auto& p : rep) s = s.replace (p.first, p.second);
+    if (s.startsWith ("Voice ") && s.length() > 12) s = "V" + s.substring (6);
     return s;
 }
 
@@ -253,7 +264,9 @@ void ExEditor::sideBoxes()
             break;
         }
     cv.fill (x, yy, w, 9, 15);
-    cv.text (x + 2, yy + 1, dynamic_cast<PolyAlgorithm*> (&plugin.alg()) != nullptr ? "VOICES" : "STATUS", 0);
+    const int nMeters = plugin.alg().numMeters();
+    cv.text (x + 2, yy + 1, dynamic_cast<PolyAlgorithm*> (&plugin.alg()) != nullptr ? juce::String ("VOICES")
+                             : nMeters > 0 ? plugin.alg().metersTitle().toUpperCase() : juce::String ("STATUS"), 0);
     cv.rect (x, yy + 9, w, y + L::topH - yy - 9, 5);
     yy += 11;
     if (auto* pa = dynamic_cast<PolyAlgorithm*> (&plugin.alg()))
@@ -277,6 +290,24 @@ void ExEditor::sideBoxes()
                 else cv.text (cx + 1, cy + (rowH - 2 - 7) / 2, juce::String (note).paddedLeft ('0', 2).substring (0, 2), 15);
             }
         }
+    }
+    else if (nMeters > 0)
+    {
+        const int rows = hasTimbre ? 1 : (nMeters > 4 ? 2 : 1), perRow = (nMeters + rows - 1) / rows, gap = 3;
+        const int cellW = (w - 4 + gap) / perRow - gap;
+        const int rowH = juce::jmin (24, (y + L::topH - 2 - yy) / rows);
+        for (int v = 0; v < nMeters; ++v)
+        {
+            auto m = plugin.alg().meter (v);
+            int cx = x + 2 + (v % perRow) * (cellW + gap), cy = yy + (v / perRow) * rowH;
+            cv.rect (cx, cy, cellW, rowH - 2, m.on ? 10 : 3);
+            int fw = juce::jlimit (0, cellW - 2, (int) std::round (juce::jlimit (0.0f, 1.0f, m.level) * (float) (cellW - 2)));
+            if (fw > 0) cv.fill (cx + 1, cy + 1, fw, rowH - 4, 6);
+            cv.text (cx + 2, cy + (rowH - 2 - 7) / 2, m.label, m.on ? 15 : 7, (cellW - 3) / 6);
+        }
+        juce::String st = plugin.alg().statusText();
+        int ly = yy + rows * rowH + 2;
+        if (st.isNotEmpty() && ly < y + L::topH - 8) cv.text (x + 3, ly, st, 10, (w - 6) / 6);
     }
     else
     {
@@ -529,7 +560,7 @@ void ExEditor::draw()
     if (dropHover)
     {
         for (auto& row : cv.px) for (auto& p : row) p = (uint8_t) (p / 4);
-        const juce::String t1 = "DROP TO IMPORT", t2 = "into the SD card's wavetables folder";
+        const juce::String t1 = "DROP TO IMPORT", t2 = plugin.alg().importHint();
         int bw = 260, bh = 40, bx = (Canvas::W - bw) / 2, by = (Canvas::H - bh) / 2;
         cv.fill (bx, by, bw, bh, 0);
         for (int k = 0; k < 2; ++k) cv.rect (bx + k * 2, by + k * 2, bw - k * 4, bh - k * 4, 15);

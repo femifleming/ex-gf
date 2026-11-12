@@ -1,6 +1,6 @@
 # EX-GF
 
-Four instruments modelled on algorithms of the Expert Sleepers **disting EX** Eurorack module. Each one comes as a **VST3**, an **AU** (macOS), an **LV2** (Linux) and a **standalone app**, for **macOS, Windows and Linux**:
+Nine instruments and effects modelled on algorithms of the Expert Sleepers **disting EX** Eurorack module. Each one comes as a **VST3**, an **AU** (macOS), an **LV2** (Linux) and a **standalone app**, for **macOS, Windows and Linux**:
 
 | Plug-in | What it is |
 |---|---|
@@ -8,8 +8,13 @@ Four instruments modelled on algorithms of the Expert Sleepers **disting EX** Eu
 | **EX Poly Wavetable** | A 16-voice wavetable synth with two envelopes, a filter, an LFO, unison, a Juno-style chorus and delay. It **imports WaveEdit banks**. |
 | **EX Poly FM** | A 16-voice, 4-timbre 6-operator FM synth built on the Plaits engine. It loads DX7 `.syx` banks and works with DX7 editors (e.g. Dexed) over SysEx. |
 | **EX Poly Exciter** | A 16-voice exciter/resonator synth with built-in exciters, exciters from the SD card or live input, and Strike, Scrape and Strum modes. |
+| **EX Granulator** | *Granulator*: granular synthesis on live input or a WAV file. Up to 40 grains, played from MIDI notes or three drones, with a delay-position LFO, delay and reverb. |
+| **EX Multi-FX** | *Multi FX*: 3-band EQ, chorus/flanger/phaser/pitch shifter, delay and reverb with free routing between them, plus the *variable sample rate* control. |
+| **EX Resonator** | *Resonator*: Mutable Instruments Rings. Six resonator models and the string-synth mode, with a stereo mix of the odd/even outputs and the dry signal. |
+| **EX Spectral Freeze** | *Spectral Freeze*: captures a moment of sound and sustains it. Four phase-vocoder voices with movement, pitch shift, etherization, delay and reverb. |
+| **EX Macro Oscillator 2** | *Macro Oscillator 2*: four instances of Mutable Instruments Plaits (all 24 models), played round-robin as a 4-voice synth or separately. |
 
-The plug-ins use the same sample, wavetable, exciter and bank formats as the module. You can point them at a real disting EX MicroSD card, and anything they create (auto-sampled folders, imported wavetables) works on the module.
+The four effects (Granulator, Multi-FX, Resonator, Spectral Freeze) process the plug-in's audio input; the rest are instruments. The plug-ins use the same sample, wavetable, exciter and bank formats as the module. You can point them at a real disting EX MicroSD card, and anything they create (auto-sampled folders, imported wavetables) works on the module.
 
 > Not affiliated with or endorsed by Expert Sleepers. "disting" is their trademark and is used here only to describe compatibility.
 
@@ -18,6 +23,9 @@ The plug-ins use the same sample, wavetable, exciter and bank formats as the mod
 <p>
 <img src="docs/screenshots/ms.png" width="49%"> <img src="docs/screenshots/wt.png" width="49%">
 <img src="docs/screenshots/rec.png" width="49%"> <img src="docs/screenshots/ex.png" width="49%">
+<img src="docs/screenshots/gr.png" width="49%"> <img src="docs/screenshots/mx.png" width="49%">
+<img src="docs/screenshots/rs.png" width="49%"> <img src="docs/screenshots/sf.png" width="49%">
+<img src="docs/screenshots/mo.png" width="49%">
 </p>
 
 The whole interface is drawn as one white-on-black pixel display in the module's own 5×7 font. Most settings are on screen:
@@ -96,11 +104,12 @@ EX-GF's code was written with Claude Code (Anthropic), working under the directi
 - **Layout choice.** The author asked to see options, then picked the "split browser" layout from four mock-ups.
 - **WaveEdit import.** Poly Wavetable loads the author's own wavetables made in the WaveEdit app.
 - **Testing.** The author asked for all four instruments to be tested and to remember their last state.
+- **Five more algorithms.** The author asked for Granulator, Multi-FX, Resonator, Spectral Freeze and Macro Oscillator 2 to be added in the same style, and supplied the firmware 1.26 manual for them.
 - **Platforms and distribution.** Builds for macOS, Windows and Linux, packaged with a README and instructions as one bundle in a public GitHub repo, with a Homebrew install.
 - **The name.** The author named the suite "EX-GF" (it was "EX Suite" before).
 
 ## Credits & licence
 - The code is licensed **AGPL-3.0** (see `LICENSE`), as required for software built with [JUCE](https://juce.com) 9 under its open-source licence.
-- The Poly FM engine is from [Mutable Instruments Plaits](https://github.com/pichenettes/eurorack) by Émilie Gillet (MIT; subset in `third_party/mi`).
+- Poly FM, Macro Oscillator 2 and Resonator use [Mutable Instruments Plaits and Rings](https://github.com/pichenettes/eurorack) by Émilie Gillet (MIT; DSP code in `third_party/mi`).
 - Algorithm behaviour follows the disting EX user manual by Expert Sleepers.
 - The sample library is built from free sources listed in `CREDITS.txt`: VSCO-2 CE, Karoryfer, AKWF and more. The scripts that rebuild it are in `tools/library`.
