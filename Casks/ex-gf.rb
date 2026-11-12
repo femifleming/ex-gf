@@ -4,12 +4,13 @@ cask "ex-gf" do
 
   url "https://github.com/femifleming/ex-gf/releases/download/v#{version}/EX-GF-#{version}-macOS.zip"
   name "EX-GF"
-  desc "Disting EX-style multisample, wavetable, FM and exciter instruments"
+  desc "Disting EX-style instruments and effects"
   homepage "https://github.com/femifleming/ex-gf"
 
   depends_on :macos
 
-  plugins = ["EX Multisample", "EX Poly Wavetable", "EX Poly FM", "EX Poly Exciter"]
+  plugins = ["EX Multisample", "EX Poly Wavetable", "EX Poly FM", "EX Poly Exciter", "EX Granulator", "EX Multi-FX",
+             "EX Resonator", "EX Spectral Freeze", "EX Macro Oscillator 2"]
   plugins.each do |p|
     app "EX-GF-#{version}-macOS/Applications/#{p}.app"
     vst3_plugin "EX-GF-#{version}-macOS/VST3/#{p}.vst3"
@@ -32,7 +33,22 @@ cask "ex-gf" do
           "/Users/{{user}}/Library/Audio/Plug-Ins/Components/EX Poly FM.component",
           "{{appdir}}/EX Poly Exciter.app",
           "/Users/{{user}}/Library/Audio/Plug-Ins/VST3/EX Poly Exciter.vst3",
-          "/Users/{{user}}/Library/Audio/Plug-Ins/Components/EX Poly Exciter.component"
+          "/Users/{{user}}/Library/Audio/Plug-Ins/Components/EX Poly Exciter.component",
+          "{{appdir}}/EX Granulator.app",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/VST3/EX Granulator.vst3",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/Components/EX Granulator.component",
+          "{{appdir}}/EX Multi-FX.app",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/VST3/EX Multi-FX.vst3",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/Components/EX Multi-FX.component",
+          "{{appdir}}/EX Resonator.app",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/VST3/EX Resonator.vst3",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/Components/EX Resonator.component",
+          "{{appdir}}/EX Spectral Freeze.app",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/VST3/EX Spectral Freeze.vst3",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/Components/EX Spectral Freeze.component",
+          "{{appdir}}/EX Macro Oscillator 2.app",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/VST3/EX Macro Oscillator 2.vst3",
+          "/Users/{{user}}/Library/Audio/Plug-Ins/Components/EX Macro Oscillator 2.component"
         ],
         must_succeed: false
   end

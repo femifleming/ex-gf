@@ -62,7 +62,11 @@ jobs:
           killall -9 AudioComponentRegistrar 2>/dev/null || true
           sleep 3
           build-release/EXTest_artefacts/Release/EXTest --host ~/Library/Audio/Plug-Ins/Components/EX*.component
-          for c in ExMs ExWt ExFm ExEx; do auval -v aumu $c Frkp | tail -2; auval -v aumu $c Frkp | grep -q "AU VALIDATION SUCCEEDED"; done
+          for au in "aumu ExMs" "aumu ExWt" "aumu ExFm" "aumu ExEx" "aumu ExMo" "aumf ExGr" "aumf ExRs" "aufx ExMx" "aufx ExSf"; do
+            auval -v $au Frkp > "$RUNNER_TEMP/auval.txt" 2>&1 || true
+            tail -2 "$RUNNER_TEMP/auval.txt"
+            grep -q "AU VALIDATION SUCCEEDED" "$RUNNER_TEMP/auval.txt"
+          done
 
       - name: Tests (Linux)
         if: runner.os == 'Linux'

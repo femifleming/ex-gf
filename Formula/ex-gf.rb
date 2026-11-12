@@ -1,5 +1,5 @@
 class ExGf < Formula
-  desc "Disting EX-style instruments (VST3/AU/LV2 + standalone apps)"
+  desc "Disting EX-style instruments and effects (VST3/AU/LV2 + standalone apps)"
   homepage "https://github.com/femifleming/ex-gf"
   url "https://github.com/femifleming/ex-gf.git",
       tag:      "v1.0.2",
@@ -25,7 +25,10 @@ class ExGf < Formula
     depends_on "libxrender"
   end
 
-  PLUGINS = %w[EXMultisample EXPolyWavetable EXPolyFM EXPolyExciter].freeze
+  PLUGINS = %w[
+    EXMultisample EXPolyWavetable EXPolyFM EXPolyExciter
+    EXGranulator EXMultiFX EXResonator EXSpectralFreeze EXMacroOsc2
+  ].freeze
 
   def install
     args = %w[-DEX_COPY_AFTER_BUILD=OFF -DEX_BUILD_TESTS=OFF]

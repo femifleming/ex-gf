@@ -11,7 +11,7 @@ $Name = "EX-GF-$Version-Windows-x64"
 $Stage = "dist\$Name"
 if (Test-Path $Stage) { Remove-Item -Recurse -Force $Stage }
 New-Item -ItemType Directory -Force -Path "$Stage\VST3", "$Stage\Apps" | Out-Null
-foreach ($t in "EXMultisample", "EXPolyWavetable", "EXPolyFM", "EXPolyExciter") {
+foreach ($t in "EXMultisample", "EXPolyWavetable", "EXPolyFM", "EXPolyExciter", "EXGranulator", "EXMultiFX", "EXResonator", "EXSpectralFreeze", "EXMacroOsc2") {
   $A = "$Build\${t}_artefacts\Release"
   Copy-Item -Recurse "$A\VST3\*.vst3" "$Stage\VST3\"
   Copy-Item "$A\Standalone\*.exe" "$Stage\Apps\"

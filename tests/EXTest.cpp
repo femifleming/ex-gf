@@ -6,6 +6,11 @@
 #include "algorithms/PolyWavetable.h"
 #include "algorithms/PolyFM.h"
 #include "algorithms/PolyExciter.h"
+#include "algorithms/Granulator.h"
+#include "algorithms/MultiFX.h"
+#include "algorithms/Resonator.h"
+#include "algorithms/SpectralFreeze.h"
+#include "algorithms/MacroOsc2.h"
 #include "core/ExEditor.h"
 
 using namespace ex;
@@ -77,8 +82,37 @@ static std::unique_ptr<TestPlugin> make (const juce::String& kind)
         p.addAlgorithm (std::make_unique<PolyWavetable> (p)); });
     if (kind == "fm") return std::make_unique<TestPlugin> (ExPlugin::Identity { "EX Poly FM", true, false, 4 }, [] (TestPlugin& p) {
         p.addAlgorithm (std::make_unique<PolyFM> (p)); });
+    if (kind == "gr") return std::make_unique<TestPlugin> (ExPlugin::Identity { "EX Granulator", false, true, 1 }, [] (TestPlugin& p) {
+        p.addAlgorithm (std::make_unique<Granulator> (p)); });
+    if (kind == "mx") return std::make_unique<TestPlugin> (ExPlugin::Identity { "EX Multi-FX", false, true, 1, false }, [] (TestPlugin& p) {
+        p.addAlgorithm (std::make_unique<MultiFX> (p)); });
+    if (kind == "rs") return std::make_unique<TestPlugin> (ExPlugin::Identity { "EX Resonator", false, true, 1 }, [] (TestPlugin& p) {
+        p.addAlgorithm (std::make_unique<Resonator> (p)); });
+    if (kind == "sf") return std::make_unique<TestPlugin> (ExPlugin::Identity { "EX Spectral Freeze", false, true, 1 }, [] (TestPlugin& p) {
+        p.addAlgorithm (std::make_unique<SpectralFreeze> (p)); });
+    if (kind == "mo") return std::make_unique<TestPlugin> (ExPlugin::Identity { "EX Macro Oscillator 2", false, false, 1 }, [] (TestPlugin& p) {
+        p.addAlgorithm (std::make_unique<MacroOsc2> (p)); });
     return std::make_unique<TestPlugin> (ExPlugin::Identity { "EX Poly Exciter", false, true, 1 }, [] (TestPlugin& p) {
         p.addAlgorithm (std::make_unique<PolyExciter> (p)); });
+}
+
+// test signal for the effects: a plucked chord every half second (harmonics + a noise burst), so there are
+// transients for Rings' onset detector and steady tones for the freeze
+static std::function<void (const juce::MidiBuffer&, juce::AudioBuffer<float>&, int64_t)> testInput (double until = 1.0e9, double sr = 48000)
+{
+    auto rnd = std::make_shared<juce::Random> (7);
+    return [=] (const juce::MidiBuffer&, juce::AudioBuffer<float>& in, int64_t pos) {
+        for (int i = 0; i < in.getNumSamples(); ++i)
+        {
+            const double t = (double) (pos + in.getNumSamples() + i) / sr; // the block that will be processed next
+            if (t > until) break;
+            const double ph = std::fmod (t, 0.5), env = std::exp (-ph * 5.0);
+            double v = 0;
+            for (double hz : { 110.0, 220.0, 277.2, 329.6, 440.0 }) v += std::sin (2 * juce::MathConstants<double>::pi * hz * t);
+            v = 0.08 * v * env + (ph < 0.01 ? 0.3 * (rnd->nextDouble() * 2 - 1) : 0.0);
+            in.setSample (0, i, (float) v); in.setSample (1, i, (float) v);
+        }
+    };
 }
 
 static void pump (int ms)
@@ -178,6 +212,10 @@ static int hostTest (const juce::StringArray& paths)
         {
             buf.clear();
             juce::MidiBuffer m;
+            // effects get something to chew on (instruments overwrite it)
+            if (inst->getTotalNumInputChannels() > 0)
+                for (int c = 0; c < juce::jmin (2, buf.getNumChannels()); ++c)
+                    for (int i = 0; i < 256; ++i) buf.setSample (c, i, 0.2f * (float) std::sin (0.03 * (double) (b * 256 + i)) * ((b / 20) % 2 ? 0.2f : 1.0f));
             if (b == 2) for (int n : { 48, 60, 64, 67 }) m.addEvent (juce::MidiMessage::noteOn (1, n, (juce::uint8) 100), 10);
             if (b == 200) for (int n : { 48, 60, 64, 67 }) m.addEvent (juce::MidiMessage::noteOff (1, n), 0);
             inst->processBlock (buf, m);
@@ -212,15 +250,24 @@ int main (int argc, char** argv)
         ExPlugin::rememberLastState = false;
         juce::File out { juce::String (argv[2]) };
         out.createDirectory();
-        for (juce::String kind : { "ms", "rec", "wt", "fm", "ex" })
+        for (juce::String kind : { "ms", "rec", "wt", "fm", "ex", "gr", "mx", "rs", "sf", "mo" })
         {
             auto p = make (kind == "rec" ? juce::String ("ms") : kind);
             p->prepareToPlay (48000, 256);
             if (kind == "rec") p->selectAlgorithm (1);
             if (kind == "fm") { p->alg().set (8, 5); }
             if (kind == "wt") { p->alg().set (7, 6); p->alg().applied[7] = 6; p->alg().confirm (7); p->alg().set (8, 35); }
+            if (kind == "gr") { p->alg().set (11, 1); p->alg().set (42, 1); p->alg().set (13, 30); }
+            if (kind == "mx") { dynamic_cast<MultiFX&> (p->alg()).loadProgram (4); }
+            if (kind == "rs") { p->alg().set (7, 1); p->alg().set (9, 2); }
+            if (kind == "mo") { p->alg().set (7, 18); p->alg().set (10, 20); }
             pump (2500);
-            render (*p, 0.6, chordEvents ({ 48, 55, 60, 64 }, 0.05, 5.0), nullptr);
+            render (*p, 1.6, chordEvents ({ 48, 55, 60, 64 }, 0.05, 5.0), nullptr, testInput());
+            if (kind == "sf")
+            {
+                p->alg().set (10, 1); p->alg().set (12, 1); p->alg().set (16, 24); p->alg().set (15, 60);
+                render (*p, 0.8, {}, nullptr, testInput());
+            }
             snapshot (*p, out.getChildFile (kind + ".png"));
         }
         return 0;
@@ -231,7 +278,7 @@ int main (int argc, char** argv)
         juce::ScopedJuceInitialiser_GUI gui;
         ExPlugin::rememberLastState = false;
         juce::Array<juce::var> algsOut;
-        for (juce::String kind : { "ms", "wt", "fm", "ex" })
+        for (juce::String kind : { "ms", "wt", "fm", "ex", "gr", "mx", "rs", "sf", "mo" })
         {
             auto p = make (kind);
             for (int ai = 0; ai < p->numAlgorithms(); ++ai)
@@ -342,6 +389,145 @@ int main (int argc, char** argv)
         }
     }
 
+    // ---------- the effects and the Plaits / Rings ports ----------
+    {
+        juce::AudioBuffer<float> cap;
+        // Macro Oscillator 2: a chord through the round-robin group, then every model
+        {
+            auto p = make ("mo");
+            p->prepareToPlay (48000, 256);
+            auto st = render (*p, 2.0, chordEvents ({ 48, 55, 60, 64 }, 0.1, 1.0), &cap);
+            writeWav (out.getChildFile ("mo_chord.wav"), cap);
+            report ("mo chord", st);
+            int silent = 0; bool bad = false; float worst = 0;
+            for (int model = 0; model < 24; ++model)
+            {
+                p->alg().set (7, model);
+                auto s2 = render (*p, 0.4, chordEvents ({ 48 + model % 12 }, 0.02, 0.3), nullptr);
+                if (s2.nan || s2.peak > 4.0f) bad = true;
+                // some FM voices fade in slowly: give those a longer note before calling them silent
+                if (s2.peak < 0.003f) s2 = render (*p, 2.5, chordEvents ({ 60 }, 0.02, 2.4), nullptr);
+                if (s2.peak < 0.003f) { ++silent; std::cout << "     silent model " << model << " " << MacroOsc2::modelName (model) << std::endl; }
+                worst = std::max (worst, s2.peak);
+            }
+            bool ok = ! bad && silent == 0;
+            if (! ok) ++failures;
+            std::cout << (ok ? "PASS" : "FAIL") << " mo all 24 models sound (max peak " << worst << ")" << std::endl;
+            snapshot (*p, out.getChildFile ("mo_ui.png"));
+        }
+        // Resonator: every mode, wet only, driven by the test input and by MIDI strums
+        {
+            auto p = make ("rs");
+            p->prepareToPlay (48000, 256);
+            p->alg().set (20, -40);
+            for (int mode = 0; mode <= 6; ++mode)
+            {
+                p->alg().set (7, mode);
+                auto st = render (*p, 1.5, chordEvents ({ 48, 55 }, 0.1, 0.6), mode == 0 ? &cap : nullptr, testInput());
+                if (mode == 0) writeWav (out.getChildFile ("rs_modal.wav"), cap);
+                report ("rs mode " + juce::String (mode), st);
+            }
+            p->alg().set (7, 0); p->alg().set (26, 0); // no audio input: the internal exciter is strummed from MIDI
+            report ("rs internal exciter", render (*p, 1.5, chordEvents ({ 60 }, 0.1, 0.6), nullptr));
+            snapshot (*p, out.getChildFile ("rs_ui.png"));
+        }
+        // Multi-FX: wet only for every pitch effect, every program, and the variable sample rate
+        {
+            auto p = make ("mx");
+            p->prepareToPlay (48000, 256);
+            p->alg().set (11, -40);
+            for (int fx = 0; fx < 3; ++fx)
+            {
+                p->alg().set (29, fx);
+                report ("mx wet, pitch effect " + juce::String (fx), render (*p, 1.5, {}, fx == 0 ? &cap : nullptr, testInput()));
+            }
+            writeWav (out.getChildFile ("mx_wet.wav"), cap);
+            auto& mx = dynamic_cast<MultiFX&> (p->alg());
+            bool bad = false; float worst = 0;
+            for (int prog = 0; prog < MultiFX::programNames().size(); ++prog)
+            {
+                mx.loadProgram (prog);
+                auto st = render (*p, 2.0, {}, nullptr, testInput());
+                if (st.nan || st.peak > 4.0f || st.peak < 0.01f) { bad = true; std::cout << "     program " << prog << " peak " << st.peak << std::endl; }
+                worst = std::max (worst, st.peak);
+            }
+            if (bad) ++failures;
+            std::cout << (bad ? "FAIL" : "PASS") << " mx all programs (max peak " << worst << ")" << std::endl;
+            mx.loadProgram (0); p->alg().set (7, -24);
+            report ("mx variable sample rate -24", render (*p, 1.5, {}, nullptr, testInput()));
+            snapshot (*p, out.getChildFile ("mx_ui.png"));
+        }
+        // Granulator: record live input and play it with a drone and with MIDI notes (wet only)
+        {
+            auto p = make ("gr");
+            p->prepareToPlay (48000, 256);
+            p->alg().set (9, -40); p->alg().set (11, 1); p->alg().set (42, 1);
+            auto st = render (*p, 3.0, {}, &cap, testInput());
+            writeWav (out.getChildFile ("gr_drone.wav"), cap);
+            report ("gr drone on live input", st);
+            p->alg().set (42, 0); p->alg().set (11, 0);
+            report ("gr MIDI notes on the buffer", render (*p, 2.0, chordEvents ({ 48, 55, 60 }, 0.1, 1.2), nullptr));
+            for (int mode = 1; mode <= 4; ++mode)
+            {
+                p->alg().set (12, mode);
+                report ("gr spawn mode " + juce::String (mode), render (*p, 1.0, chordEvents ({ 50 }, 0.05, 0.8), nullptr));
+            }
+            snapshot (*p, out.getChildFile ("gr_ui.png"));
+        }
+        // Spectral Freeze: freeze the input, then it must keep sounding with silence at the input (wet only)
+        {
+            auto p = make ("sf");
+            p->prepareToPlay (48000, 256);
+            p->alg().set (21, -40);
+            render (*p, 1.2, {}, nullptr, testInput());
+            p->alg().set (10, 1);
+            auto st = render (*p, 2.0, {}, &cap);
+            writeWav (out.getChildFile ("sf_freeze.wav"), cap);
+            report ("sf frozen voice sustains", st);
+            float tail = 0;
+            for (int i = cap.getNumSamples() - 4800; i < cap.getNumSamples(); ++i) tail = std::max (tail, std::abs (cap.getSample (0, i)));
+            bool ok = tail > 0.003f;
+            if (! ok) ++failures;
+            std::cout << (ok ? "PASS" : "FAIL") << " sf still sounding after 2 s (" << tail << ")" << std::endl;
+            p->alg().set (10, 0); p->alg().set (20, 0);
+            auto rel = render (*p, 1.5, {}, &cap);
+            tail = 0;
+            for (int i = cap.getNumSamples() - 4800; i < cap.getNumSamples(); ++i) tail = std::max (tail, std::abs (cap.getSample (0, i)));
+            ok = ! rel.nan && tail < 0.002f;
+            if (! ok) ++failures;
+            std::cout << (ok ? "PASS" : "FAIL") << " sf released voice fades out (" << tail << ")" << std::endl;
+            snapshot (*p, out.getChildFile ("sf_ui.png"));
+        }
+        // random settings must never produce NaNs, infinities or a crash
+        for (juce::String kind : { "gr", "mx", "rs", "sf", "mo" })
+        {
+            auto p = make (kind);
+            p->prepareToPlay (48000, 256);
+            juce::Random r (42);
+            bool bad = false; float worst = 0;
+            for (int round = 0; round < 30 && ! bad; ++round)
+            {
+                auto& a = p->alg();
+                for (int n = 7; n <= a.numParams(); ++n)
+                    if (r.nextFloat() < 0.5f) a.set (n, a.def (n).min + r.nextInt (a.def (n).max - a.def (n).min + 1));
+                auto st = render (*p, 0.3, chordEvents ({ 36 + r.nextInt (48), 60 }, 0.02, 0.2), nullptr, testInput());
+                worst = std::max (worst, st.peak);
+                if (st.nan || st.peak > 20.0f) { bad = true; std::cout << "     round " << round << " peak " << st.peak << (st.nan ? " NaN" : "") << std::endl; }
+            }
+            if (bad) ++failures;
+            std::cout << (bad ? "FAIL " : "PASS ") << kind << " random settings (max peak " << worst << ")" << std::endl;
+        }
+        // the fixed-rate engines (Plaits, Rings) at other host sample rates
+        for (double rate : { 44100.0, 96000.0 })
+            for (juce::String kind : { "mo", "rs" })
+            {
+                auto p = make (kind);
+                p->prepareToPlay (rate, 256);
+                if (kind == "rs") p->alg().set (20, -40);
+                report (kind + " at " + juce::String ((int) rate) + " Hz", render (*p, 1.5, chordEvents ({ 48, 60 }, 0.1, 0.8), nullptr, testInput (1.0e9, rate)));
+            }
+    }
+
     // ---------- auto-sampler loopback ----------
     {
         auto p = make ("ms");
@@ -401,7 +587,7 @@ int main (int argc, char** argv)
         else folder.deleteRecursively();
     }
     // ---------- state save / restore for every plug-in ----------
-    for (juce::String kind : { "wt", "fm", "ex", "ms" })
+    for (juce::String kind : { "wt", "fm", "ex", "ms", "gr", "mx", "rs", "sf", "mo" })
     {
         auto a = make (kind);
         a->prepareToPlay (48000, 256);

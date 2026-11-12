@@ -16,7 +16,7 @@ from reportlab.platypus import (BaseDocTemplate, PageTemplate, Frame, Paragraph,
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PARAMS = json.load(open(sys.argv[1]))
 OUT = sys.argv[2]
-VERSION = "1.0.2"
+VERSION = "1.1.0"
 
 # ------------------------------------------------------------------ pixel font (from Source/core/ExFont.h)
 FONT = {}
@@ -175,7 +175,9 @@ def shot(name, width=170 * mm):
     return img
 
 
-CV_ONLY = re.compile(r"Attenuverter|Input mode|Gate offset|bend input|Arp reset input|Wave input|Rec CV Mode|Play CV Mode|Pitch bend input")
+CV_ONLY = re.compile(r"Attenuverter|Input mode|Gate offset|bend input|Arp reset input|Wave input|Rec CV Mode|Play CV Mode|Pitch bend input"
+                     r"|Reserved|VSR attenuator|VSR input|Pitch shift input|Aux input|clock input|multiplier|Delay mean input|I2C mode"
+                     r"|^(Strum|V/Oct|Brightness|Frequency|Damping|Structure|Position) input")
 
 
 def param_table(alg):
@@ -266,8 +268,9 @@ def story(doc):
     s.append(PixelHeading("USER MANUAL", px=2.2, align="center", rule=False, space=20))
     s.append(shot("fm", 165 * mm))
     s.append(Spacer(1, 10 * mm))
-    s.append(P("<para alignment='center'>Four disting EX-style instruments: <b>EX Multisample</b> · <b>EX Poly Wavetable</b> · "
-               "<b>EX Poly FM</b> · <b>EX Poly Exciter</b><br/>VST3 · AU · LV2 · standalone - macOS, Windows and Linux</para>"))
+    s.append(P("<para alignment='center'>Nine disting EX-style instruments and effects: <b>EX Multisample</b> · <b>EX Poly Wavetable</b> · "
+               "<b>EX Poly FM</b> · <b>EX Poly Exciter</b> · <b>EX Granulator</b> · <b>EX Multi-FX</b> · <b>EX Resonator</b> · "
+               "<b>EX Spectral Freeze</b> · <b>EX Macro Oscillator 2</b><br/>VST3 · AU · LV2 · standalone - macOS, Windows and Linux</para>"))
     s.append(Spacer(1, 30 * mm))
     s.append(P(f"<para alignment='center'>Version {VERSION} - github.com/femifleming/ex-gf</para>", small))
     from reportlab.platypus.doctemplate import NextPageTemplate
@@ -282,7 +285,7 @@ def story(doc):
 
     # ---------------- intro
     s.append(H1("INTRODUCTION"))
-    s.append(P("<b>EX-GF</b> is a suite of four software instruments modelled on algorithms of the Expert Sleepers "
+    s.append(P("<b>EX-GF</b> is a suite of nine software instruments and effects modelled on algorithms of the Expert Sleepers "
                "<b>disting EX</b> Eurorack module. They follow the module's manual (firmware 1.26) parameter for parameter, "
                "use the same file formats (sample folders, wavetables, exciters, DX7 banks, Scala tunings) and wear the "
                "module's look: the whole window is one white-on-black pixel display in the module's own 5×7 font."))
@@ -293,6 +296,11 @@ def story(doc):
         ["EX Poly Wavetable", "10 - Poly Wavetable", "16-voice wavetable synth: 2 envelopes, filter, LFO, unison, Juno-style chorus and delay. Imports WaveEdit banks."],
         ["EX Poly FM", "23 - Poly FM", "16-voice, 4-timbre 6-operator FM (the Plaits engine). Loads DX7 .syx banks; DX7 editors can edit it over SysEx."],
         ["EX Poly Exciter", "13 - Poly Exciter", "16-voice exciter/resonator synth: plucked, struck and bowed-like sounds from short exciter samples or live input."],
+        ["EX Granulator", "11 - Granulator", "Effect. Granular synthesis on live input or a WAV file, played from MIDI notes or three drones, with delay and reverb."],
+        ["EX Multi-FX", "12 - Multi FX", "Effect. 3-band EQ, chorus/flanger/phaser/pitch shift, delay and reverb with free routing and a variable sample rate."],
+        ["EX Resonator", "20 - Resonator", "Effect played from MIDI. Mutable Instruments Rings: six resonator models and the string-synth mode."],
+        ["EX Spectral Freeze", "24 - Spectral Freeze", "Effect. Captures a moment of sound and sustains it: four phase-vocoder voices with movement and pitch shift."],
+        ["EX Macro Oscillator 2", "21 - Macro Oscillator 2", "Four instances of Mutable Instruments Plaits (24 models), as a 4-voice synth or four separate oscillators."],
     ], [32 * mm, 36 * mm, 102 * mm]))
     s.append(Spacer(1, 6))
     s.append(P("Each instrument is available as a <b>VST3</b> (all platforms), <b>Audio Unit</b> (macOS), <b>LV2</b> (Linux) and a "
@@ -312,16 +320,16 @@ def story(doc):
     s.append(P("Homebrew 7 asks you to <i>trust</i> third-party taps once. To build from source instead (macOS or Linux): "
                "<font face='Courier'>brew install ex-gf</font>, then follow the link instructions it prints."))
     s.append(H2("MACOS - DOWNLOAD"))
-    s += B(["<b>EX-GF-1.0.2-macOS.zip</b>: unzip and double-click <b>install.command</b> - apps go to ~/Applications, plug-ins to "
+    s += B([f"<b>EX-GF-{VERSION}-macOS.zip</b>: unzip and double-click <b>install.command</b> - apps go to ~/Applications, plug-ins to "
             "~/Library/Audio/Plug-Ins/VST3 and /Components.",
-            "<b>EX-GF-1.0.2-macOS.pkg</b>: installs for all users (right-click → Open the first time).",
+            f"<b>EX-GF-{VERSION}-macOS.pkg</b>: installs for all users (right-click → Open the first time).",
             "The builds are universal (Apple silicon + Intel) but not notarised. If macOS or your DAW refuses to open them, run:"])
     s.append(C("xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/EX*.vst3 \\\n    ~/Library/Audio/Plug-Ins/Components/EX*.component ~/Applications/EX*.app"))
     s.append(H2("WINDOWS"))
-    s.append(P("Unzip <b>EX-GF-1.0.2-Windows-x64.zip</b>, right-click <b>install.ps1</b> → <i>Run with PowerShell</i> (as administrator). "
+    s.append(P(f"Unzip <b>EX-GF-{VERSION}-Windows-x64.zip</b>, right-click <b>install.ps1</b> → <i>Run with PowerShell</i> (as administrator). "
                "VST3 plug-ins go to C:\\Program Files\\Common Files\\VST3; the apps appear in the Start menu under <b>EX-GF</b>."))
     s.append(H2("LINUX"))
-    s.append(C("tar xzf EX-GF-1.0.2-Linux-x86_64.tar.gz\ncd ex-gf-1.0.2-Linux-x86_64 && ./install.sh"))
+    s.append(C(f"tar xzf EX-GF-{VERSION}-Linux-x86_64.tar.gz\ncd ex-gf-{VERSION}-Linux-x86_64 && ./install.sh"))
     s.append(P("VST3 → ~/.vst3, LV2 → ~/.lv2, apps → ~/.local/bin with desktop menu entries."))
     s.append(H2("THE SAMPLE LIBRARY"))
     s.append(P("Download <b>EX-SD-Card.zip</b> and unzip it into your <b>Music</b> folder so you have <b>Music/EX SD Card</b> (the default "
@@ -343,10 +351,11 @@ def story(doc):
         ["", "Area", "What it does"],
         ["", "Top bar", "<b>SAVE</b> / <b>LOAD</b> presets (stored on the SD card), <b>SD</b> chooses the card folder, <b>MIDI</b> channels, "
                         "<b>PANIC</b> (all notes off), <b>MENU</b> (every option of the module's menus). In EX Multisample the centre holds the algorithm tabs."],
-        ["1", "Timbre / voices", "Timbre buttons (multi-timbral plug-ins) choose which timbre the lists edit. The 16 cells show each voice's note and level."],
+        ["1", "Timbre / voices", "Timbre, oscillator or target buttons choose what the lists edit. The cells show each voice's note and level "
+                                 "(in the effects: input, section or voice levels)."],
         ["2", "Module display", "The disting EX's own 128×32 screen: current parameter, live voices, levels, auto-sampler progress. "
                                 "Mouse wheel = parameter, shift+wheel = value; ↑↓ and ←→ act like the P and V encoders, Enter = push P (menu), Esc = push V."],
-        ["3", "Actions", "Buttons for the algorithm: RECORD, PLAY, AUTO, TEST, IMPORT, WAVEEDIT, NOTES OFF, RESCAN …"],
+        ["3", "Actions", "Buttons for the algorithm: RECORD, PLAY, AUTO, TEST, IMPORT, WAVEEDIT, FREEZE, STRUM, BYPASS, NOTES OFF …"],
         ["4", "Status line", "Hover anything for a description. MIDI IN / OUT activity lights sit at either end."],
         ["5/8", "Lists", "Click to load: sample folders and their samples, wavetables and their waves, exciter tables and exciters, FM banks and voices, recordings."],
         ["6", "Section tabs", "Pages of related parameters (e.g. ENV, FILTER, CHORD, FX)."],
@@ -361,6 +370,12 @@ def story(doc):
             "(timbre 1 on the receive channel, timbre 2 on the next …) unless you assign each timbre its own channel.",
             "Recognised: note on/off, velocity, pitch bend, sustain (CC64), All Notes Off (CC123); channel and poly aftertouch in Poly Exciter; "
             "DX7 SysEx in Poly FM. <i>Delay uses MIDI clk</i> (menu) locks delay times to the host tempo."])
+    s.append(H2("EFFECTS AND AUDIO INPUT"))
+    s.append(P("<b>EX Granulator</b>, <b>EX Multi-FX</b>, <b>EX Resonator</b> and <b>EX Spectral Freeze</b> process the plug-in's audio input. "
+               "Multi-FX and Spectral Freeze are ordinary insert effects. Granulator and Resonator are effects that are also played from MIDI "
+               "(Audio Unit type <i>MIDI-controlled effect</i>): put them where they receive both audio and notes - in Logic they are in the "
+               "instrument slot's <i>AU MIDI-controlled Effects</i> menu with the audio chosen as the side chain; in other hosts insert them on an "
+               "audio track and route a MIDI track to them. In the standalone apps choose the input under <i>Options → Audio/MIDI settings</i>."))
     s.append(H2("OUTPUTS"))
     s.append(P("<b>Out 1/2</b> is the main stereo output. <b>Out 3/4</b> is a second stereo bus (enable it in your DAW) carrying per-timbre or "
                "per-voice outputs depending on the <i>Output mode</i>, the paraphonic gate and mono mix (as on the module), and the "
@@ -382,9 +397,11 @@ def story(doc):
         ["wavetables/", "Each wavetable is a sub-folder of single-cycle WAVs (used alphabetically), or one WAV of concatenated cycles "
                         "(600 samples each; 256 for WaveEdit banks - detected automatically). Optional <i>playlist-wavetable.txt</i> with -wavelength=."],
         ["exciters/", "Each exciter table is a folder of up to 128 short WAVs, or one WAV containing exactly 128 equal-length exciters."],
-        ["FMSYX/", "DX7 32-voice bank SysEx files (.syx, 4104 bytes). Without any, three built-in banks are used."],
+        ["FMSYX/", "DX7 32-voice bank SysEx files (.syx, 4104 bytes). Without any, three built-in banks are used. "
+                   "MACRO2_1.SYX - MACRO2_3.SYX are the banks of Macro Oscillator 2."],
         ["scl/  kbm/", "Scala scales and keyboard maps for the Scala/MTS and Scala KBM parameters."],
         ["!RECORD/", "WAV Recorder recordings (REC00001.WAV …)."],
+        ["!GRANUL8/", "Granulator buffers saved with SAVE (GRAN0001.WAV …)."],
         ["AUTO0001/ …", "Auto-sampler output - ordinary multisample folders."],
         ["presets/", "Presets saved with SAVE."],
     ], [30 * mm, 140 * mm]))
@@ -531,6 +548,197 @@ def story(doc):
     s.append(H2("PARAMETERS"))
     s.append(param_table(alg(13)))
 
+    # ---------------- Granulator
+    s.append(PageBreak())
+    s.append(H1("EX GRANULATOR"))
+    s.append(shot("gr"))
+    s.append(Spacer(1, 6))
+    s.append(P("Granular synthesis: many short snippets (grains) of the audio in a buffer, played with randomised timing, length, pitch and "
+               "pan. The buffer (mono, up to 31.25 s) is recorded from the audio input or loaded from a WAV file. Grain clouds are started by "
+               "<b>notes</b>: MIDI notes, or the three <b>drones</b> you simply switch on. Nothing sounds until the buffer holds audio."))
+    s += B(["<b>Two ways to start:</b> feed audio in, press <b>RECORD</b> and switch on <b>DRONE 1</b>; or load a WAV and play notes.",
+            "<b>Lists:</b> the left list shows the folders on the SD card that contain WAVs (plus !GRANUL8 and !RECORD), the right list the "
+            "WAV files in that folder. Click a file to load it, or drag a WAV onto the window. The buffer size is set to the file's length.",
+            "<b>BUFFER</b>: size, input gain, record, record fade. <i>Input feedback</i> echoes the input at the buffer length; "
+            "<i>Main feedback</i> records the grains back into the buffer. The write position only moves while recording.",
+            "<b>GRAINS</b>: spawn mode, rate, size, window shape, opacity (the share of grains that actually sound), reverse probability, "
+            "grain limit and normalize. <i>Size mean</i> 0 makes each grain one cycle of the note's pitch.",
+            "<b>PITCH</b>: pitch mean and spread (<i>Pitch quantize</i> snaps the random part to octaves, fourths, fifths or triads) and pan. "
+            "<i>Natural pitch</i> is the note that plays the audio at its recorded pitch.",
+            "<b>POS</b>: <i>Delay mean/spread</i> set where in the buffer grains start, as a percentage of the buffer or in ms "
+            "(<i>Delay unit</i>). The LFO sweeps that position; at speed 196 and depth 100% it moves at normal playback speed.",
+            "<b>MOD</b>: note envelope (100 ms - 30 s), and how envelope, velocity and pitch affect opacity, level, pitch and position. "
+            "<b>DRONES</b>: pitch, opacity and level of the three drones.",
+            "<b>FX</b> and <b>REVERB</b>: stereo or ping-pong delay and a reverb. <i>Effects routing</i> decides whether they act on the "
+            "grains only or on the mix with the dry input.",
+            "<b>VISUALS</b> shows the buffer waveform with the grain positions, the number of grains, the played range, and the delay mean "
+            "and buffer size in ms. <b>SAVE</b> writes the buffer to <i>!GRANUL8/GRANnnnn.WAV</i>. A loaded or saved file is remembered and "
+            "reloaded with the preset or project.",
+            "Out 1/2 is the mix with effects; Out 3/4 is the grains alone."])
+    s.append(table([
+        ["Spawn mode", "Behaviour"],
+        ["Stochastic", "Grains start at random intervals set by Rate mean and Rate spread."],
+        ["Mid-grain", "A new grain starts at the middle of the current one. With Size spread 0 and the Equal power shape this loops smoothly."],
+        ["… (fixed)", "As above, but grain positions are measured from the write position at the moment the note started, so a note keeps "
+                      "its timbre while recording continues. Without recording there is no difference."],
+        ["Single", "Exactly one grain per note."],
+    ], [30 * mm, 140 * mm]))
+    s.append(CondPageBreak(60 * mm))
+    s.append(H2("PARAMETERS"))
+    s.append(param_table(alg(11)))
+
+    # ---------------- Multi-FX
+    s.append(PageBreak())
+    s.append(H1("EX MULTI-FX"))
+    s.append(shot("mx"))
+    s.append(Spacer(1, 6))
+    s.append(P("A stereo multi-effects processor: a 3-band EQ feeding a pitch section, a delay and a reverb, all running at once, with "
+               "free routing between them and a variable sample rate. The left list holds 13 <b>programs</b> to start from; choosing one "
+               "resets every parameter and then applies the program."))
+    s += B(["<b>Routing</b>: each of the pitch, delay and reverb sections takes a mix of two sources (<i>input 1</i>, <i>input 2</i>, "
+            "<i>input mix</i>) chosen from Pre-EQ, Post-EQ, Pitch, Delay or Reverb. Sections can be chained in any order, run in parallel, "
+            "or fed back into each other. Feedback loops can howl - route with care.",
+            "<b>MIX</b>: dry gain (pre- or post-EQ), overall effects gain, one gain per section, saturation and mono input. "
+            "<i>Aux outputs</i> chooses which section appears on Out 3/4.",
+            "<b>EQ</b>: band 1 is a 6 or 12 dB/octave high-pass or a low shelf; band 2 a peak/notch with Q; band 3 a 6 or 12 dB/octave "
+            "low-pass or a high shelf. Frequencies are set as MIDI note numbers (69 = 440 Hz).",
+            "<b>PITCH</b>: chorus/flanger, phaser or pitch shifter. For a chorus use a longish <i>Chorus delay</i> with low depth and feedback; "
+            "for a flanger a short delay, high depth and feedback to taste. <i>Spread</i> 180° gives the classic stereo chorus. In phaser mode "
+            "<i>Chorus delay</i> sets the centre frequency. <i>Blend</i> below zero crossfades dry to wet; above zero it adds wet to dry.",
+            "<b>DELAY</b>: mono, stereo (separate left and right times) or ping-pong (with <i>mono-ize</i> and <i>initial pan</i>). Each has "
+            "a <i>fade</i> version, which crossfades to a new time, and a <i>slew</i> version, which glides like tape. <b>TAP</b> sets the time; "
+            "MENU → Multi FX → Options → <i>Delay uses MIDI clk</i> follows the host tempo.",
+            "<b>REVERB</b>: four models, time from 0.4 to 30 s, size, high damping, modulation, early and diffuse levels, input low-pass.",
+            "<b>VSR</b> (variable sample rate) lowers the internal sample rate in semitones. Every EQ frequency drops, delay and reverb "
+            "times stretch, and the tails already in the buffers change pitch. -24 gives a 12 kHz retro sound and four times the delay time. "
+            "<i>Quantize</i> snaps the rate to a scale.",
+            "<b>BYPASS</b> passes the input through, <b>CLEAR</b> empties the delay and reverb. The LEVELS cells show input, pitch, delay "
+            "and reverb activity; the display shows CLIP when the output overloads."])
+    s.append(P("The reverb model names (Room, Hall, Plate, Cathedral) and the Quantize scale names are EX-GF's own - the module's manual "
+               "does not list them. Parameters that select CV inputs are kept for numbering only.", small))
+    s.append(CondPageBreak(60 * mm))
+    s.append(H2("PARAMETERS"))
+    s.append(param_table(alg(12)))
+
+    # ---------------- Resonator
+    s.append(PageBreak())
+    s.append(H1("EX RESONATOR"))
+    s.append(shot("rs"))
+    s.append(Spacer(1, 6))
+    s.append(P("The disting EX's port of Mutable Instruments <b>Rings</b>, using the original DSP code. It resonates the audio input, or "
+               "plays its own exciter when you send notes. Demos and tutorials for Rings apply to it directly."))
+    s.append(table([
+        ["Mode", "What it is"],
+        ["Modal", "A bank of resonant band-pass filters: bars, bells, plates."],
+        ["Sympathetic strings", "A string with sympathetic strings tuned by Structure."],
+        ["String", "A plucked/bowed string with dispersion (inharmonicity)."],
+        ["FM voice", "A two-operator FM voice driven by the input's envelope."],
+        ["Symp. quantized", "Sympathetic strings tuned to the chosen chord."],
+        ["String + reverb", "The string model followed by a reverb."],
+        ["String synth", "Rings' hidden string-machine mode, with six effects (formant filter, chorus, reverb, and brighter variants)."],
+    ], [38 * mm, 132 * mm]))
+    s.append(Spacer(1, 4))
+    s += B(["<b>Lists</b>: the left list selects the mode; the right list the chord (for the chord modes) or the String synth effect.",
+            "<b>MODEL</b>: polyphony (1-4 notes ring at once), <i>Structure</i>, <i>Brightness</i>, <i>Damping</i> and <i>Position</i> as on Rings.",
+            "<b>Playing</b>: <i>MIDI mode</i> chooses what a note does - set the pitch, strum, or both (the default here; the module's "
+            "default is Off). With MIDI mode Off or Pitch, Rings strums itself from pitch changes or from transients in the input, exactly "
+            "as the module does with nothing patched to Strum. <b>STRUM</b> (or pushing L) strums by hand.",
+            "<b>INPUT</b> off (<i>Audio input</i> = None) makes Rings use its internal exciter instead of the audio input.",
+            "<b>MIX</b>: input gain, noise gate, output gain, dry gain, and pan positions for the odd output, the even output and the "
+            "dry signal. The dry signal is at 0 dB by default, as on the module; <b>DRY</b> mutes it.",
+            "Out 1/2 is the stereo mix, Out 3 is odd + even, Out 4 is a mono mix of the stereo output. "
+            "The engine runs at 48 kHz internally and is resampled at other host rates."])
+    s.append(CondPageBreak(60 * mm))
+    s.append(H2("PARAMETERS"))
+    s.append(param_table(alg(20)))
+
+    # ---------------- Spectral Freeze
+    s.append(PageBreak())
+    s.append(H1("EX SPECTRAL FREEZE"))
+    s.append(shot("sf"))
+    s.append(Spacer(1, 6))
+    s.append(P("An audio freeze: it captures the sound at one moment and sustains it for as long as you like. It works on the spectrum "
+               "(a phase vocoder), so the result is a smooth sustained texture rather than a loop, and it can also be played back at any "
+               "speed and pitch. There are four independent freeze voices."))
+    s += B(["<b>FREEZE</b> (or pushing L) freezes. With Target <b>A</b> (auto), the first press freezes the next free voice, the second "
+            "releases it and the third freezes a new one - so a double press crossfades to a fresh capture.",
+            "<b>TARGET 1-4</b>: FREEZE toggles that voice, so you can capture up to four different moments and play them together. "
+            "The left <b>Voices</b> list shows each voice's state; click a row to freeze or release it.",
+            "<b>MOVE</b>: a single frozen frame is completely static, so the voice can move around in the audio just before the freeze point. "
+            "<i>Depth</i> sets how much audio is used (in FFT frames, shown in ms; 1 = static), <i>Rate</i> the speed (0 = stopped, 100 = "
+            "original speed, shown as a slow-down factor) and <i>Movement</i> the direction. <i>Offset</i> moves the freeze point back in time.",
+            "<i>Etherization</i> below 127 progressively drops the transient parts of the sound, leaving a few pure tones.",
+            "<b>LIVE</b> (<i>Live process</i>) starts a voice that resynthesizes the live input instead of a frozen moment - a way to use "
+            "etherization and pitch shift on live audio. <b>UNFREEZE</b> releases all voices.",
+            "<b>VOICES</b> and <b>PITCH</b>: gain, pan and coarse/fine pitch shift per voice, added to the global shift. "
+            "<i>Attack</i> and <i>Release</i> set the fade times.",
+            "<b>MIX</b> and <b>FX</b>: dry and freeze gains, saturation, a delay and a reverb. Each effect can sit on the freeze output only "
+            "or on the whole output mix; the delay comes first.",
+            "<b>VISUALS</b> switches the module display to the four-quadrant view: envelope bar, the segment in use and the play position, "
+            "with a T on the target voice.",
+            "Out 1/2 is the mix; Out 3/4 is the dry input."])
+    s.append(table([
+        ["Movement", "Behaviour"],
+        ["Forwards", "Plays the audio forwards in a loop (the loop point is interpolated, not crossfaded)."],
+        ["Backwards", "The same in reverse."],
+        ["Alternating", "Forwards and backwards in turn."],
+        ["Random walk", "The position moves continuously but changes direction at random."],
+        ["Random skip", "The position jumps to random places."],
+    ], [30 * mm, 140 * mm]))
+    s.append(Spacer(1, 4))
+    s.append(table([
+        ["MIDI note", "Action"],
+        ["C3, D3, E3, F3 (48, 50, 52, 53)", "Set the freeze target to voice 1-4."],
+        ["G3 (55) / A3 (57) / B3 (59)", "Freeze toggle / freeze gate (while held) / target Auto."],
+        ["C4, D4, E4, F4 (60, 62, 64, 65)", "Toggle voices 1-4."],
+        ["C5, D5, E5, F5 (72, 74, 76, 77)", "Freeze voices 1-4 while the key is held."],
+    ], [60 * mm, 110 * mm]))
+    s.append(P("MIDI control works in the VST3 and LV2 versions and the app; Audio Unit hosts do not send MIDI to insert effects.", small))
+    s.append(CondPageBreak(60 * mm))
+    s.append(H2("PARAMETERS"))
+    s.append(param_table(alg(24)))
+
+    # ---------------- Macro Oscillator 2
+    s.append(PageBreak())
+    s.append(H1("EX MACRO OSCILLATOR 2"))
+    s.append(shot("mo"))
+    s.append(Spacer(1, 6))
+    s.append(P("Four instances of Mutable Instruments <b>Plaits</b> (firmware 1.2, original DSP code). Out of the box it is a 4-voice "
+               "synth: the four oscillators take notes in turn (round-robin) and share one set of settings. Demos and tutorials for Plaits "
+               "apply to it directly."))
+    s += B(["<b>OSCILLATOR 1-4</b> chooses which oscillator the lists edit. The left list holds the 24 <b>models</b>; with one of the "
+            "6-op FM models selected, the right list shows the 32 voices of its bank (the <i>Harmonics</i> control selects the voice).",
+            "<b>OSC 1-4</b> pages: <i>Harmonics</i>, <i>Timbre</i>, <i>Morph</i>, FM and modulation amounts (driven by Plaits' internal decay "
+            "envelope), <i>LP gate</i> colour, <i>Time/decay</i> and tuning.",
+            "<b>Shared settings</b>: <i>Share set</i> (MIDI page) says whose settings an oscillator uses. By default all four use "
+            "oscillator 1's, so the OSC 2-4 pages have no effect until you press <b>UNLINK</b>, which gives every oscillator its own - "
+            "then each note of a chord can use a different model. (The module's default is unlinked.)",
+            "<b>MIDI option</b> per oscillator: <i>Off</i> (the oscillator drones), <i>Pitch</i>, <i>Pitch/trig</i>, <i>Trig</i>, "
+            "<i>Trig by</i> one note (for the drum models) or <i>Poly</i> (round-robin group), each on the receive channel or one of the "
+            "next three. The default here is Poly for all four; the module's default is Off.",
+            "<b>Envelope</b>: <i>Trigger</i> pings the low-pass gate as a trigger does on Plaits, and the sound decays by "
+            "<i>Time/decay</i>. <i>Gate</i> (<b>GATE ENV</b>) holds the sound while the key is down. Velocity sets the level - or the "
+            "accent in the drum, string, modal and 6-op FM models. The 6-op FM voices sustain while the key is held in either mode.",
+            "<b>Outputs</b>: in <i>Mixed</i> mode Out 1 (left) carries all the main outputs and Out 2 (right) all the aux outputs; Out 3/4 "
+            "repeat them. <b>SPLIT OUT</b> (<i>Individual</i>) assigns any oscillator's main or aux output to each of Out 1-4.",
+            "<b>FM banks</b>: FMSYX/MACRO2_1.SYX, MACRO2_2.SYX and MACRO2_3.SYX on the SD card replace the three built-in banks. "
+            "MENU → Macro Oscillator 2 → <i>Write FM banks to SD</i> creates them from the built-in banks.",
+            "The engine runs at 48 kHz internally and is resampled at other host rates."])
+    s.append(table([
+        ["#", "Model", "#", "Model", "#", "Model"],
+        ["0", "Virtual analog", "8", "Granular cloud", "16", "Virtual analog with filter"],
+        ["1", "Waveshaper", "9", "Filtered noise", "17", "Phase distortion"],
+        ["2", "2-op FM", "10", "Particle noise", "18", "6-op FM 1"],
+        ["3", "Granular formant", "11", "Inharmonic string", "19", "6-op FM 2"],
+        ["4", "Harmonic", "12", "Modal resonator", "20", "6-op FM 3"],
+        ["5", "Wavetable", "13", "Analog bass drum", "21", "Wave terrain"],
+        ["6", "Chords", "14", "Analog snare", "22", "String machine"],
+        ["7", "Speech", "15", "Analog hi-hat", "23", "Chiptune"],
+    ], [8 * mm, 48 * mm, 8 * mm, 48 * mm, 8 * mm, 50 * mm]))
+    s.append(CondPageBreak(60 * mm))
+    s.append(H2("PARAMETERS"))
+    s.append(param_table(alg(21)))
+
     # ---------------- troubleshooting
     s.append(PageBreak())
     s.append(H1("TROUBLESHOOTING"))
@@ -540,6 +748,9 @@ def story(doc):
          "The builds are not notarised. Run the <font face='Courier'>xattr -dr com.apple.quarantine …</font> command from the install chapter, then rescan plug-ins."],
         ["No sound from EX Multisample", "Check the SD folder has sample folders (SD → Show in Finder) and that a folder is selected in the left list."],
         ["Notes hang", "Press PANIC (or MIDI → All notes off)."],
+        ["An effect is silent", "Granulator, Multi-FX, Resonator and Spectral Freeze need audio at the plug-in input. In the apps choose the "
+                                "input under Options → Audio/MIDI settings and un-mute it. The Granulator also needs RECORD (or a loaded WAV) and a note or drone."],
+        ["Logic does not list Granulator or Resonator as insert effects", "They are MIDI-controlled effects: choose them in an instrument slot under AU MIDI-controlled Effects and select the audio as the side chain."],
         ["The DAW does not see Out 3/4", "Enable the plug-in's second output bus in the DAW's routing/IO settings."],
         ["Auto-sampled files start late or early", "Run TEST and set AS Latency just below the measured value."],
         ["Large folders take a moment to load", "Samples load into memory in the background; very large libraries (hundreds of MB) take a few seconds."],
@@ -549,7 +760,7 @@ def story(doc):
     # ---------------- credits
     s.append(H1("CREDITS AND LICENCE"))
     s += B(["EX-GF is open source under the <b>GNU AGPL-3.0</b>; source code at github.com/femifleming/ex-gf.",
-            "Built with JUCE 9 (AGPLv3). Poly FM uses the FM engine of Mutable Instruments Plaits by Émilie Gillet (MIT).",
+            "Built with JUCE 9 (AGPLv3). Poly FM, Macro Oscillator 2 and Resonator use the DSP code of Mutable Instruments Plaits and Rings by Émilie Gillet (MIT).",
             "Behaviour follows the disting EX user manual by Expert Sleepers. Not affiliated with Expert Sleepers.",
             "Sample library: VSCO-2 Community Edition, Karoryfer (Emily Guitar, Growlybass, Hadzi-Fia), Virtuosity Drums, AKWF wavetables, "
             "Greg Sullivan CP80 (CC BY 3.0) and generated content - see CREDITS.txt in the library for details."])
@@ -559,7 +770,7 @@ def story(doc):
 def build():
     # two passes so the contents page knows page numbers
     doc = Doc(OUT)
-    doc.toc_prev = [("INTRODUCTION", 3)] * 9
+    doc.toc_prev = [("INTRODUCTION", 3)] * 15
     doc.build(story(doc))
     first = list(doc.toc)
     doc = Doc(OUT)

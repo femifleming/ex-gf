@@ -441,7 +441,13 @@ void ExPlugin::buildMenu()
     }));
     r.push_back (MenuItem::sub ("Misc", {
         MenuItem::act ("All notes off", [this] { allNotesOffRequest = true; message ("All notes off"); menuOpen = false; }),
-        MenuItem::act ("About", [this] { message (identity.product + " v1.0", 2.5); menuOpen = false; }),
+        MenuItem::act ("About", [this] {
+           #ifdef JucePlugin_VersionString
+            message (identity.product + " v" + JucePlugin_VersionString, 2.5);
+           #else
+            message (identity.product, 2.5);
+           #endif
+            menuOpen = false; }),
     }));
     // start on the algorithm's own menu (like the module, which opens near the algorithm entry)
     menuPath = { algs.size() > 1 ? 1 : 0 };
