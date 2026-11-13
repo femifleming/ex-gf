@@ -113,3 +113,7 @@ EX-GF's code was written with Claude Code (Anthropic), working under the directi
 - Poly FM, Macro Oscillator 2 and Resonator use [Mutable Instruments Plaits and Rings](https://github.com/pichenettes/eurorack) by Émilie Gillet (MIT; DSP code in `third_party/mi`).
 - Algorithm behaviour follows the disting EX user manual by Expert Sleepers.
 - The sample library is built from free sources listed in `CREDITS.txt`: VSCO-2 CE, Karoryfer, AKWF and more. The scripts that rebuild it are in `tools/library`.
+
+## Request log
+
+Everything that was asked for while this was designed and built is in [REQUESTS.md](REQUESTS.md).
