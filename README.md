@@ -1,4 +1,6 @@
-# EX-GF
+<p align="center"><img src="Resources/icons/EXMultisample.png" width="64" alt="EX Multisample icon">&nbsp;&nbsp;<img src="Resources/icons/EXPolyWavetable.png" width="64" alt="EX Poly Wavetable icon">&nbsp;&nbsp;<img src="Resources/icons/EXPolyFM.png" width="64" alt="EX Poly FM icon">&nbsp;&nbsp;<img src="Resources/icons/EXPolyExciter.png" width="64" alt="EX Poly Exciter icon">&nbsp;&nbsp;<img src="Resources/icons/EXGranulator.png" width="64" alt="EX Granulator icon">&nbsp;&nbsp;<img src="Resources/icons/EXMultiFX.png" width="64" alt="EX Multi-FX icon">&nbsp;&nbsp;<img src="Resources/icons/EXResonator.png" width="64" alt="EX Resonator icon">&nbsp;&nbsp;<img src="Resources/icons/EXSpectralFreeze.png" width="64" alt="EX Spectral Freeze icon">&nbsp;&nbsp;<img src="Resources/icons/EXMacroOsc2.png" width="64" alt="EX Macro Oscillator 2 icon"></p>
+
+# ex-gf
 
 Nine instruments and effects modelled on algorithms of the Expert Sleepers **disting EX** Eurorack module. Each one comes as a **VST3**, an **AU** (macOS), an **LV2** (Linux) and a **standalone app**, for **macOS, Windows and Linux**:
 
