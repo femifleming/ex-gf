@@ -16,7 +16,7 @@ from reportlab.platypus import (BaseDocTemplate, PageTemplate, Frame, Paragraph,
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PARAMS = json.load(open(sys.argv[1]))
 OUT = sys.argv[2]
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 
 # ------------------------------------------------------------------ pixel font (from Source/core/ExFont.h)
 FONT = {}
