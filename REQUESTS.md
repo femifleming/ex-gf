@@ -56,3 +56,5 @@ Every request typed while this was being designed and built with Claude Code, in
 
 > keep going until ci is green then merge and release
 
+
+1. "for every single app and vst on my github, just make the app logo icon extremely minimal, a letter from this font [Septambres Neau] in some color, on some color background, update all the app icons." (New app icons: one Septambres Neau glyph, one colour on one colour.)

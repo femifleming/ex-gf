@@ -81,7 +81,7 @@ function(ex_plugin target product code desc sources midiOut)
         FORMATS ${EX_FORMATS}
         PRODUCT_NAME "${product}"
         DESCRIPTION "${desc}"
-        ICON_BIG Resources/icon.png
+        ICON_BIG Resources/icons/${target}.png
         IS_SYNTH ${isSynth}
         NEEDS_MIDI_INPUT ${midiIn}
         NEEDS_MIDI_OUTPUT ${midiOut}
