@@ -39,19 +39,19 @@ Releases: **https://github.com/femifleming/ex-gf/releases**
 
 ### macOS - Homebrew
 ```sh
-brew tap femifleming/ex-gf https://github.com/femifleming/ex-gf
-brew trust femifleming/ex-gf         # Homebrew 7+ asks you to trust third-party taps
-brew install --cask ex-gf            # apps + VST3 + AU
-brew install --cask ex-gf-sd-card    # optional: the free sample library -> ~/Music/EX SD Card
+brew tap femifleming/tap
+brew trust --tap femifleming/tap     # Homebrew 7+ asks you to trust a tap first
+brew install --cask femifleming/tap/ex-gf            # apps + VST3 + AU
+brew install --cask femifleming/tap/ex-gf-sd-card    # optional: the free sample library -> ~/Music/EX SD Card
 ```
 The builds aren't notarised. If your DAW won't load the plug-ins, clear the download flag with:
 `xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/EX*.vst3 ~/Library/Audio/Plug-Ins/Components/EX*.component`
 
 ### macOS / Linux - Homebrew from source
 ```sh
-brew tap femifleming/ex-gf https://github.com/femifleming/ex-gf
-brew trust femifleming/ex-gf
-brew install ex-gf                   # builds from source; `brew info ex-gf` shows where the plug-ins went
+brew tap femifleming/tap
+brew trust --tap femifleming/tap
+brew install --formula femifleming/tap/ex-gf                   # builds from source; `brew info ex-gf` shows where the plug-ins went
 ```
 
 ### macOS (download)

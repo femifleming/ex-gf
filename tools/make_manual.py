@@ -313,12 +313,12 @@ def story(doc):
     s.append(H1("INSTALLING"))
     s.append(P("All downloads are on the release page: <b>github.com/femifleming/ex-gf/releases</b>."))
     s.append(H2("MACOS - HOMEBREW"))
-    s.append(C("brew tap femifleming/ex-gf https://github.com/femifleming/ex-gf\n"
-               "brew trust femifleming/ex-gf\n"
-               "brew install --cask ex-gf            # apps + VST3 + AU\n"
-               "brew install --cask ex-gf-sd-card    # optional sample library"))
+    s.append(C("brew tap femifleming/tap\n"
+               "brew trust --tap femifleming/tap\n"
+               "brew install --cask femifleming/tap/ex-gf            # apps + VST3 + AU\n"
+               "brew install --cask femifleming/tap/ex-gf-sd-card    # optional sample library"))
     s.append(P("Homebrew 7 asks you to <i>trust</i> third-party taps once. To build from source instead (macOS or Linux): "
-               "<font face='Courier'>brew install ex-gf</font>, then follow the link instructions it prints."))
+               "<font face='Courier'>brew install --formula femifleming/tap/ex-gf</font>, then follow the link instructions it prints."))
     s.append(H2("MACOS - DOWNLOAD"))
     s += B([f"<b>EX-GF-{VERSION}-macOS.zip</b>: unzip and double-click <b>install.command</b> - apps go to ~/Applications, plug-ins to "
             "~/Library/Audio/Plug-Ins/VST3 and /Components.",
