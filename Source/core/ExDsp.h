@@ -31,9 +31,9 @@ inline float lfoHz (int v) { return 0.01f * std::pow (1000.0f, (juce::jlimit (-1
 inline float noteHz (float n) { return 440.0f * std::pow (2.0f, (n - 69.0f) / 12.0f); }
 inline float dbToGain (float db) { return std::pow (10.0f, db / 20.0f); }
 
-inline float softSat (float x) // smooth saturation, unity gain for small signals, asymptote ±1.2
+inline float softSat (float x) // smooth saturation, unity gain for small signals, never beyond full scale (±1)
 {
-    const float a = 1.2f;
+    const float a = 1.0f;
     float y = x / a;
     if (y > 3.0f) return a;
     if (y < -3.0f) return -a;

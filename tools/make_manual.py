@@ -16,7 +16,7 @@ from reportlab.platypus import (BaseDocTemplate, PageTemplate, Frame, Paragraph,
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PARAMS = json.load(open(sys.argv[1]))
 OUT = sys.argv[2]
-VERSION = "1.1.1"
+VERSION = "1.1.2"
 
 # ------------------------------------------------------------------ pixel font (from Source/core/ExFont.h)
 FONT = {}
@@ -304,8 +304,8 @@ def story(doc):
     ], [32 * mm, 36 * mm, 102 * mm]))
     s.append(Spacer(1, 6))
     s.append(P("Each instrument is available as a <b>VST3</b> (all platforms), <b>Audio Unit</b> (macOS), <b>LV2</b> (Linux) and a "
-               "<b>standalone app</b>. Settings are saved with your DAW project, and every plug-in also remembers its last state "
-               "between sessions."))
+               "<b>standalone app</b>. A new plug-in instance always starts on the default settings; everything you set is saved "
+               "with your DAW project and in your DAW's own presets. The standalone apps reopen where you left off."))
     s.append(P("EX-GF is not affiliated with or endorsed by Expert Sleepers; \"disting\" is their trademark and is used "
                "only to describe compatibility. If you own the module, its MicroSD card works directly with these plug-ins.", small))
 
@@ -381,11 +381,16 @@ def story(doc):
                "per-voice outputs depending on the <i>Output mode</i>, the paraphonic gate and mono mix (as on the module), and the "
                "auto-sampler's CV/gate."))
     s.append(H2("SAVING AND REMEMBERING"))
-    s += B(["In a DAW, each instance is saved with the project.",
-            "<b>SAVE</b> writes a preset to <i>SD card/presets/&lt;plug-in&gt;</i>; <b>LOAD</b> lists them (plus <i>Reset to defaults</i>).",
-            "Every plug-in and app also remembers its <b>last state</b>: it is written whenever you change something and when the plug-in closes, "
-            "and a new instance starts from it. The files live in ~/Library/Application Support/EX-GF (macOS), "
-            "%APPDATA%\\EX-GF (Windows) or ~/.config/EX-GF (Linux)."])
+    s += B(["A <b>new instance always starts on the defaults</b> listed in this manual. Nothing is loaded by itself: no preset, and "
+            "no settings left over from another instance or an earlier session.",
+            "In a DAW, each instance is saved with the project, and your DAW's own presets (a device preset in Ableton Live, an "
+            ".fxp / .vstpreset / .aupreset elsewhere) store and recall <b>every</b> parameter, together with the MIDI channels, "
+            "the knob mappings, the loaded Granulator WAV, an FM voice edited from a DX7 editor, the open page and the window size.",
+            "Sample folders, wavetables, exciter tables and FM banks are saved <b>by name</b> as well as by number, so a preset "
+            "still finds its folder after the card has gained or lost folders.",
+            "<b>SAVE</b> writes a preset to <i>SD card/presets/&lt;plug-in&gt;</i>; <b>LOAD</b> lists them (plus <i>Reset to defaults</i>). "
+            "These are only ever loaded when you choose one.",
+            "The <b>standalone apps</b> reopen with the settings they were closed with."])
 
     # ---------------- SD card
     s.append(PageBreak())
@@ -556,7 +561,9 @@ def story(doc):
     s.append(P("Granular synthesis: many short snippets (grains) of the audio in a buffer, played with randomised timing, length, pitch and "
                "pan. The buffer (mono, up to 31.25 s) is recorded from the audio input or loaded from a WAV file. Grain clouds are started by "
                "<b>notes</b>: MIDI notes, or the three <b>drones</b> you simply switch on. Nothing sounds until the buffer holds audio."))
-    s += B(["<b>Two ways to start:</b> feed audio in, press <b>RECORD</b> and switch on <b>DRONE 1</b>; or load a WAV and play notes.",
+    s += B(["<b>Two ways to start:</b> feed audio in, press <b>RECORD</b> and switch on <b>DRONE 1</b>; or load a WAV and play notes. "
+            "With the default settings the grains play audio from 2.5 s back (<i>Delay mean</i> 50% of a 5 s buffer), so a new "
+            "recording is heard after 2.5 s; turn <i>Delay mean</i> down to hear it sooner.",
             "<b>Lists:</b> the left list shows the folders on the SD card that contain WAVs (plus !GRANUL8 and !RECORD), the right list the "
             "WAV files in that folder. Click a file to load it, or drag a WAV onto the window. The buffer size is set to the file's length.",
             "<b>BUFFER</b>: size, input gain, record, record fade. <i>Input feedback</i> echoes the input at the buffer length; "
@@ -674,6 +681,8 @@ def story(doc):
             "<i>Attack</i> and <i>Release</i> set the fade times.",
             "<b>MIX</b> and <b>FX</b>: dry and freeze gains, saturation, a delay and a reverb. Each effect can sit on the freeze output only "
             "or on the whole output mix; the delay comes first.",
+            "<i>Mono input</i> is <b>Stereo</b> by default: the dry signal passes through in stereo and the freeze listens to left + right. "
+            "(The module's default is Mono, which uses the left input only and would drop the right channel of a stereo track.)",
             "<b>VISUALS</b> switches the module display to the four-quadrant view: envelope bar, the segment in use and the play position, "
             "with a T on the target voice.",
             "Out 1/2 is the mix; Out 3/4 is the dry input."])
@@ -750,6 +759,8 @@ def story(doc):
         ["Notes hang", "Press PANIC (or MIDI → All notes off)."],
         ["An effect is silent", "Granulator, Multi-FX, Resonator and Spectral Freeze need audio at the plug-in input. In the apps choose the "
                                 "input under Options → Audio/MIDI settings and un-mute it. The Granulator also needs RECORD (or a loaded WAV) and a note or drone."],
+        ["A plug-in opens with odd settings", "Versions before 1.1.2 started each new instance from the last settings any instance had used. From 1.1.2 a new "
+                                              "instance always starts on the defaults; LOAD → Reset to defaults puts an old instance back."],
         ["Logic does not list Granulator or Resonator as insert effects", "They are MIDI-controlled effects: choose them in an instrument slot under AU MIDI-controlled Effects and select the audio as the side chain."],
         ["The DAW does not see Out 3/4", "Enable the plug-in's second output bus in the DAW's routing/IO settings."],
         ["Auto-sampled files start late or early", "Run TEST and set AS Latency just below the measured value."],

@@ -19,6 +19,8 @@ public:
     void drawPage (Oled& o, int cur) override;
     void addMenuItems (std::vector<MenuItem>& items) override;
     void onSelected() override;
+    void saveExtra (juce::XmlElement& x) const override { x.setAttribute ("selOsc", selOsc); }
+    void loadExtra (const juce::XmlElement& x) override { selOsc = juce::jlimit (0, kOscs - 1, x.getIntAttribute ("selOsc", 0)); }
     std::vector<BrowserSpec> browsers() override;
     std::vector<ActionSpec> actions() override;
     juce::String statusText() override;

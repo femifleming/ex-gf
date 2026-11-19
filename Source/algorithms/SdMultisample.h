@@ -30,7 +30,7 @@ class SdMultisample : public PolyAlgorithm, private juce::Timer
 {
 public:
     explicit SdMultisample (ExPlugin& p);
-    ~SdMultisample() override { stopTimer(); stopJobs(); }
+    ~SdMultisample() override { alive->store (false); stopTimer(); stopJobs(); }
     void prepare (double sampleRate, int block) override;
     void configure() override;
     void renderVoices (float* const* out, int start, int n) override;
@@ -41,9 +41,10 @@ public:
     void drawPage (Oled& o, int cur) override;
     void addMenuItems (std::vector<MenuItem>& items) override;
     void onSelected() override;
+    void waitForLoads() override;
     bool pushR (int cur) override;
-    void saveExtra (juce::XmlElement& x) const override { x.setAttribute ("transposeLimit", transposeLimit); }
-    void loadExtra (const juce::XmlElement& x) override { transposeLimit = x.getIntAttribute ("transposeLimit", 0); }
+    void saveExtra (juce::XmlElement& x) const override;
+    void loadExtra (const juce::XmlElement& x) override;
 
     int transposeLimit = 0; // 0 = off
     int uiTimbre = 0;
@@ -69,6 +70,9 @@ private:
     int loadedFolder[3] { -2, -2, -2 }, wantedFolder[3] { 0, -1, -1 };
     juce::Array<juce::File> folders;
     std::vector<std::shared_ptr<SampleSet>> graveyard;
+    // a finished load is handed over on the message thread; that message can arrive after the plug-in was removed
+    std::shared_ptr<std::atomic<bool>> alive = std::make_shared<std::atomic<bool>> (true);
+    juce::CriticalSection loadLock;   // folders / loadedFolder / graveyard: the message thread, and the audio thread in offline renders
     StereoDelay delay;
     Biquad bassL, bassR, trebL, trebR;
     int eqBass = 9999, eqTreb = 9999;

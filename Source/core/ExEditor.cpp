@@ -21,7 +21,10 @@ ExEditor::ExEditor (ExPlugin& p) : juce::AudioProcessorEditor (p), plugin (p)
     setResizable (true, true);
     setResizeLimits (Canvas::W, Canvas::H, Canvas::W * 4, Canvas::H * 4);
     if (auto* c = getConstrainer()) c->setFixedAspectRatio ((double) Canvas::W / Canvas::H);
-    setSize (baseW, baseH);
+    // the window opens at the size it was left at (saved with the plug-in's state)
+    const bool saved = p.editorW >= Canvas::W && p.editorH >= Canvas::H;
+    setSize (saved ? juce::jmin (p.editorW, Canvas::W * 4) : baseW, saved ? juce::jmin (p.editorH, Canvas::H * 4) : baseH);
+    sizeTracked = true;
     draw();
     startTimerHz (30);
 }
@@ -39,6 +42,7 @@ void ExEditor::resized()
     pixScale = juce::jmax (1, juce::jmin (getWidth() / Canvas::W, getHeight() / Canvas::H));
     scale = (float) pixScale;
     origin = { (getWidth() - Canvas::W * pixScale) / 2, (getHeight() - Canvas::H * pixScale) / 2 };
+    if (sizeTracked) { plugin.editorW = getWidth(); plugin.editorH = getHeight(); }
 }
 
 void ExEditor::paint (juce::Graphics& g)
@@ -424,7 +428,7 @@ void ExEditor::tabsAndTiles (int x, int y, int w, int h)
     auto& a = plugin.alg();
     const int ai = juce::jmin (7, plugin.currentAlgorithmIndex());
     if (a.sections.empty()) return;
-    int& s = section[ai];
+    int& s = plugin.uiSection[ai];
     s = juce::jlimit (0, (int) a.sections.size() - 1, s);
     const int n = (int) a.sections.size();
     const int perRow = n <= 2 ? n : 4, rowsT = (n + perRow - 1) / perRow;
@@ -436,7 +440,7 @@ void ExEditor::tabsAndTiles (int x, int y, int w, int h)
         int inRow = juce::jmin (perRow, n - row * perRow);
         int rowX = x + (w - (inRow * tw + (inRow - 1) * 3)) / 2;
         button (rowX + col * (tw + 3), y + row * 14, tw, a.sections[(size_t) i].name, i == s, [this, i, ai, ap] {
-            section[ai] = i; gridScroll[ai] = 0;
+            plugin.uiSection[ai] = i; gridScroll[ai] = 0;
             if (! ap->sections[(size_t) i].params.empty()) plugin.selectParam (ap->sections[(size_t) i].params.front()); });
     }
     const int top = y + rowsT * 14 + 2;

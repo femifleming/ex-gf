@@ -26,6 +26,8 @@ public:
     void drawPage (Oled& o, int cur) override;
     void addMenuItems (std::vector<MenuItem>& items) override { addStandardPolyMenu (items, true, false); }
     void onSelected() override;
+    void saveExtra (juce::XmlElement& x) const override;
+    void loadExtra (const juce::XmlElement& x) override;
     bool pushR (int cur) override;
     std::vector<BrowserSpec> browsers() override;
     std::vector<ActionSpec> actions() override

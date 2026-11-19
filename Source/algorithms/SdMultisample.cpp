@@ -243,7 +243,7 @@ std::vector<BrowserSpec> SdMultisample::browsers()
                 int ch = plugin.timbreChannel[uiTimbre] > 0 ? plugin.timbreChannel[uiTimbre] : juce::jmax (1, plugin.rxChannel) + uiTimbre;
                 plugin.keyboardState.noteOn (ch, note, 0.8f);
                 auto* ks = &plugin.keyboardState;
-                juce::Timer::callAfterDelay (700, [ks, ch, note] { ks->noteOff (ch, note, 0.0f); });
+                juce::Timer::callAfterDelay (700, [ks, ch, note, tok = alive] { if (tok->load()) ks->noteOff (ch, note, 0.0f); });
             } };
     return { t, f, z };
 }
@@ -267,9 +267,42 @@ void SdMultisample::prepare (double sampleRate, int block)
 
 void SdMultisample::onSelected()
 {
+    const juce::ScopedLock sl (loadLock);
     folders = SdCard::sampleFolders();
     for (auto& l : loadedFolder) l = -2;
     timerCallback();
+}
+
+// the three Folder parameters are indices into the card's folder list: the names are saved with them
+void SdMultisample::saveExtra (juce::XmlElement& x) const
+{
+    x.setAttribute ("transposeLimit", transposeLimit);
+    x.setAttribute ("uiTimbre", uiTimbre);
+    const juce::ScopedLock sl (loadLock);
+    static const int folderParam[3] = { 7, 42, 43 };
+    for (int t = 0; t < 3; ++t)
+    {
+        const int v = pv (folderParam[t]);
+        if (v >= 0 && v < folders.size()) x.setAttribute ("folder" + juce::String (t + 1), folders[v].getFileName());
+    }
+}
+
+void SdMultisample::loadExtra (const juce::XmlElement& x)
+{
+    transposeLimit = x.getIntAttribute ("transposeLimit", 0);
+    uiTimbre = juce::jlimit (0, 2, x.getIntAttribute ("uiTimbre", 0));
+    const juce::ScopedLock sl (loadLock);
+    if (folders.isEmpty()) folders = SdCard::sampleFolders();
+    juce::StringArray names;
+    for (auto& f : folders) names.add (f.getFileName());
+    static const int folderParam[3] = { 7, 42, 43 };
+    for (int t = 0; t < 3; ++t)
+    {
+        const int v = pv (folderParam[t]);
+        if (v >= 0) load (folderParam[t], indexForName (names, v, x.getStringAttribute ("folder" + juce::String (t + 1))));
+    }
+    // start loading now rather than at the next timer tick
+    if (juce::MessageManager::existsAndIsCurrentThread()) timerCallback();
 }
 
 juce::String SdMultisample::folderName (int idx) const
@@ -281,6 +314,7 @@ juce::String SdMultisample::folderName (int idx) const
 void SdMultisample::timerCallback()
 {
     // (re)load folders for the three timbres when the Folder parameters change
+    const juce::ScopedLock sl (loadLock);
     if (folders.isEmpty()) folders = SdCard::sampleFolders();
     const int f1 = pv (7);
     int want[3] = { f1, pv (42) < 0 ? f1 : pv (42), pv (43) < 0 ? f1 : pv (43) };
@@ -296,9 +330,11 @@ void SdMultisample::timerCallback()
             { std::atomic_store (&sets[t], setFor (o)); shared = true; break; }
         if (shared || idx < 0) { if (idx < 0) std::atomic_store (&sets[t], std::shared_ptr<SampleSet>()); continue; }
         auto folder = folders[idx];
-        runAsync ([this, t, idx, folder] {
+        runAsync ([this, t, idx, folder, tok = alive] {
             auto s = SampleSet::load (folder);
-            juce::MessageManager::callAsync ([this, t, idx, s] {
+            juce::MessageManager::callAsync ([this, t, idx, s, tok] {
+                if (! tok->load()) return;
+                const juce::ScopedLock sl2 (loadLock);
                 if (loadedFolder[t] != idx) return;
                 if (auto old = setFor (t)) graveyard.push_back (old);
                 std::atomic_store (&sets[t], s);
@@ -307,6 +343,31 @@ void SdMultisample::timerCallback()
     }
     // free sample sets that no voice uses any more
     graveyard.erase (std::remove_if (graveyard.begin(), graveyard.end(), [] (const std::shared_ptr<SampleSet>& s) { return s.use_count() <= 1; }), graveyard.end());
+}
+
+// Offline render: the background loader may not have finished (and its result is handed over on the message
+// thread, which some hosts do not run while they render), so the folders the parameters ask for are loaded here.
+void SdMultisample::waitForLoads()
+{
+    const juce::ScopedLock sl (loadLock);
+    if (folders.isEmpty()) folders = SdCard::sampleFolders();
+    if (folders.isEmpty()) return;
+    const int f1 = pv (7);
+    const int want[3] = { f1, pv (42) < 0 ? f1 : pv (42), pv (43) < 0 ? f1 : pv (43) };
+    for (int t = 0; t < 3; ++t)
+    {
+        const int idx = juce::jlimit (0, folders.size() - 1, want[t]);
+        const auto name = folders[idx].getFileName();
+        auto cur = setFor (t);
+        if (cur && cur->folderName == name) continue;
+        std::shared_ptr<SampleSet> s;
+        for (int o = 0; o < 3; ++o)
+            if (auto so = setFor (o); o != t && so && so->folderName == name) s = so;
+        if (! s) s = SampleSet::load (folders[idx]);
+        if (cur) graveyard.push_back (cur);
+        loadedFolder[t] = idx;
+        std::atomic_store (&sets[t], s);
+    }
 }
 
 void SdMultisample::configure()

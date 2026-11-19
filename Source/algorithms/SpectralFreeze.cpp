@@ -47,7 +47,8 @@ SpectralFreeze::SpectralFreeze (ExPlugin& p) : FxAlgorithm (p, 24, "Spectral Fre
     add ("Live process", 0, 1, 0, {}, offOn);                                          // 54
     add ("Unfreeze all", 0, 1, 0, {}, offOn);                                          // 55
     for (int i = 56; i <= 64; ++i) add ("Reserved " + juce::String (i), 0, 1, 0);      // 56-64 (not in the manual)
-    add ("Mono input", 0, 1, 1, {}, { "Stereo", "Mono" });                             // 65
+    // the module defaults to mono (one patch cable); a plug-in sits on a stereo track, where that would drop the right channel
+    add ("Mono input", 0, 1, 0, {}, { "Stereo", "Mono" });                             // 65
     add ("Delay routing", 0, 1, 0, {}, { "Freeze output", "Output mix" });             // 66
     add ("Reverb routing", 0, 1, 0, {}, { "Freeze output", "Output mix" });            // 67
     add ("Saturation", 0, 1, 0, {}, offOn);                                            // 68

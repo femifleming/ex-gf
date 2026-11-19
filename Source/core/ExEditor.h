@@ -90,7 +90,8 @@ private:
     Hit active; bool hasActive = false, dragged = false;
     juce::Point<int> hover { -1, -1 }, downPos;
     float scale = 2.0f;
-    int section[8] {}, gridScroll[8] {}, listScroll[8][4] {};
+    int gridScroll[8] {}, listScroll[8][4] {};   // the open parameter page is ExPlugin::uiSection (saved with the state)
+    bool sizeTracked = false;
     int pixScale = 2;
     juce::Point<int> origin;
     std::vector<OverlayPage> overlay;

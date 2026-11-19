@@ -76,7 +76,7 @@ Download **EX-SD-Card.zip** from the release and unzip it into your Music folder
 - **Lists:** click a folder, wavetable, bank or voice to load it.
 - **Parameter tiles:** drag up/down or use the mouse wheel. Hold shift for fine steps, double-click to reset. Tiles with a ▾ open a list of choices.
 - **Display:** the wheel moves through parameters and shift+wheel changes the value. ↑↓ / ←→ / Enter / Esc work like the module's P and V encoders.
-- **SAVE / LOAD:** presets stored on the SD card. Each plug-in also **remembers its last state** automatically, both in the app and in new plug-in instances.
+- **Defaults and presets:** a new plug-in instance always starts on the default settings - no preset, nothing left over from another instance. Your DAW's project and its own presets (for example a device preset in Ableton Live) save and recall every parameter. **SAVE / LOAD** keep presets on the SD card, loaded only when you pick one. The standalone apps reopen where you left off.
 - **Playing:** MIDI, or the computer keyboard with **A W S E D F T G Y H U J K** (**Z/X** change octave).
 
 ## Build from source
@@ -86,6 +86,8 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release        # add -G Ninja if you have it
 cmake --build build --config Release
 build/EXTest_artefacts/Release/EXTest out          # offline tests
 build/EXTest_artefacts/Release/EXTest --host build/*_artefacts/Release/VST3/*.vst3   # load the plug-ins like a DAW
+python3 tools/audit.py build/EXTest_artefacts/Release/EXTest out/audit build/*_artefacts/Release/VST3/*.vst3   # defaults, presets, stereo: one table
+python3 tools/reaper_audit.py build/EXTest_artefacts/Release/EXTest out/reaper <folder with the .vst3s> --au   # the same inside REAPER (macOS)
 ```
 Options: `-DEX_COPY_AFTER_BUILD=ON` installs into your plug-in folders, and `-DEX_BUILD_TESTS=OFF` skips the test tool.
 Manual: `EXTest --dump-params params.json && python3 tools/make_manual.py params.json docs/EX-GF-manual.pdf` (needs `pip install reportlab pillow`).

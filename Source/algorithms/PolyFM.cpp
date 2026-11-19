@@ -134,6 +134,7 @@ PolyFM::PolyFM (ExPlugin& p) : PolyAlgorithm (p, 23, "Poly FM")
         { "KEYS", { 35, 36, 38, 37, 66, 67, 71, 50, 51, 74 } },
     };
     for (auto& e : editedFlag) e = false;
+    for (auto& e : restoreEdit) e = 0;
     algorithms.Init();
     engine.startVoice = [this] (const PolyNoteEngine::VoiceStart& s)
     {
@@ -211,6 +212,41 @@ void PolyFM::scanBanks()
     std::atomic_store (&bankList, list);
 }
 
+// Bank parameters are indices into the card's FMSYX list: the bank names are saved with them. A voice that was
+// edited from a DX7 editor (and not written to a bank) is saved too.
+void PolyFM::saveExtra (juce::XmlElement& x) const
+{
+    x.setAttribute ("uiTimbre", uiTimbre);
+    auto l = banks();
+    for (int t = 0; t < kTimbres; ++t)
+    {
+        const int b = pv (7 + t * 7);
+        if (l && b >= 1 && b <= (int) l->size()) x.setAttribute ("bank" + juce::String (t + 1), (*l)[(size_t) b - 1].name);
+        if (editedFlag[t].load()) x.setAttribute ("edit" + juce::String (t + 1), juce::Base64::toBase64 (timbreVoice[t], 128));
+    }
+}
+
+void PolyFM::loadExtra (const juce::XmlElement& x)
+{
+    uiTimbre = juce::jlimit (0, kTimbres - 1, x.getIntAttribute ("uiTimbre", 0));
+    if (! banks()) scanBanks();
+    juce::StringArray names;
+    if (auto l = banks()) for (auto& b : *l) names.add (b.name);
+    for (int t = 0; t < kTimbres; ++t)
+    {
+        const int n = 7 + t * 7, b = pv (n);
+        if (b >= 1) load (n, indexForName (names, b - 1, x.getStringAttribute ("bank" + juce::String (t + 1))) + 1);
+        juce::MemoryOutputStream voice;
+        const auto edit = x.getStringAttribute ("edit" + juce::String (t + 1));
+        if (edit.isNotEmpty() && juce::Base64::convertFromBase64 (voice, edit) && voice.getDataSize() == 128)
+        {
+            std::memcpy (restoredVoice[t], voice.getData(), 128);
+            restoreEdit[t] = 2;
+        }
+        else restoreEdit[t] = 1;
+    }
+}
+
 void PolyFM::timerCallback()
 {
     for (int t = 0; t < kTimbres; ++t) timbreEdited[t] = editedFlag[t].load();
@@ -237,11 +273,16 @@ void PolyFM::refreshTimbres()
     if (! l || l->empty()) return;
     for (int t = 0; t < kTimbres; ++t)
     {
+        const int restore = restoreEdit[t].exchange (0);
+        if (restore != 0) { editedFlag[t] = false; loadedBank[t] = -1; }   // a loaded state decides what the timbre plays
         int b = effBank (t), v = effVoice (t);
-        if (b == loadedBank[t] && v == loadedVoice[t] && l == loadedList) continue;
-        if (b != loadedBank[t] || v != loadedVoice[t]) editedFlag[t] = false;
-        loadedBank[t] = b; loadedVoice[t] = v;
-        if (! editedFlag[t]) std::memcpy (timbreVoice[t], (*l)[(size_t) b].data.data() + v * 128, 128);
+        if (! (b == loadedBank[t] && v == loadedVoice[t] && l == loadedList))
+        {
+            if (b != loadedBank[t] || v != loadedVoice[t]) editedFlag[t] = false;
+            loadedBank[t] = b; loadedVoice[t] = v;
+            if (! editedFlag[t]) std::memcpy (timbreVoice[t], (*l)[(size_t) b].data.data() + v * 128, 128);
+        }
+        if (restore == 2) { std::memcpy (timbreVoice[t], restoredVoice[t], 128); editedFlag[t] = true; }
     }
     loadedList = l;
 }

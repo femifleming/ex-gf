@@ -58,3 +58,10 @@ Every request typed while this was being designed and built with Claude Code, in
 
 
 1. "for every single app and vst on my github, just make the app logo icon extremely minimal, a letter from this font [Septambres Neau] in some color, on some color background, update all the app icons." (New app icons: one Septambres Neau glyph, one colour on one colour.)
+
+
+## 2026-11-17
+
+> Check that all of the ex-gf bundle vets work correctly, they need to all load with default values, not random values, and no presets, but I want to be able to save a preset of the plugin in Ableton and have it remember the param positions when I load that preset. Right now the ex granulator is not working, test that these work
+
+> make sure all vsts work well. some vsts mono the sound as opposed to the vst3 that works well, just double check.

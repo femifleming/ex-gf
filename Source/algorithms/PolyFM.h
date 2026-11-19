@@ -29,6 +29,8 @@ public:
     void drawPage (Oled& o, int cur) override;
     void addMenuItems (std::vector<MenuItem>& items) override;
     void onSelected() override;
+    void saveExtra (juce::XmlElement& x) const override;
+    void loadExtra (const juce::XmlElement& x) override;
 
     std::shared_ptr<std::vector<FmBank>> banks() const { return std::atomic_load (&bankList); }
     static constexpr int kTimbres = 4;
@@ -55,6 +57,9 @@ private:
     uint8_t timbreVoice[kTimbres][128] {};
     bool timbreEdited[kTimbres] {};
     std::atomic<bool> editedFlag[kTimbres];
+    // a voice edited over SysEx is saved with the state and handed back to the audio thread on load
+    uint8_t restoredVoice[kTimbres][128] {};
+    std::atomic<int> restoreEdit[kTimbres];   // 0 nothing, 1 drop the edit, 2 take restoredVoice
     int loadedBank[kTimbres] { -1, -1, -1, -1 }, loadedVoice[kTimbres] { -1, -1, -1, -1 };
     std::shared_ptr<std::vector<FmBank>> loadedList;
     StereoDelay delay;

@@ -94,7 +94,8 @@ public:
     int numParams() const { return (int) defs.size(); }
     int pv (int n) const { return params[(size_t) n - 1]->get(); }   // 1-based parameter number
     const ParamDef& def (int n) const { return defs[(size_t) n - 1]; }
-    void set (int n, int v);
+    void set (int n, int v);            // from the UI: wrapped in a change gesture, so hosts record it as automation
+    void load (int n, int v);           // from a saved state or preset: no gesture
     juce::AudioParameterInt* param (int n) { return params[(size_t) n - 1]; }
 
     // add a parameter (numbers are assigned in order: first call = parameter 1)
@@ -132,10 +133,21 @@ public:
     virtual void saveExtra (juce::XmlElement& x) const { juce::ignoreUnused (x); }
     virtual void loadExtra (const juce::XmlElement& x) { juce::ignoreUnused (x); }
 
+    // A parameter that is an index into a list of files on the card (a sample folder, a wavetable, a bank) is saved
+    // together with the file's name, so a preset still finds its file when the list has changed since (a new folder
+    // from the auto-sampler, say). Returns the index to use for a saved index and name.
+    static int indexForName (const juce::StringArray& names, int savedIndex, const juce::String& savedName)
+    {
+        if (savedName.isEmpty() || (savedIndex >= 0 && savedIndex < names.size() && names[savedIndex] == savedName)) return savedIndex;
+        const int found = names.indexOf (savedName);
+        return found >= 0 ? found : savedIndex;
+    }
+
     // pending 'PUSH V' confirmations: applied value per parameter
     std::map<int, int> applied;
     int appliedValue (int n) const { auto it = applied.find (n); return it != applied.end() ? it->second : pv (n); }
     bool awaitingConfirm (int n) const { return def (n).confirm && appliedValue (n) != pv (n); }
+    int browsing = 0;   // the 'PUSH V' parameter being turned on the module display (0 = none); values from the host apply at once
 
     // common helper: menu items for the poly algorithms (MIDI notes, delay clock, all notes off)
     void addStandardPolyMenu (std::vector<MenuItem>& items, bool hasDelay, bool hasParaGate);
@@ -145,19 +157,19 @@ public:
 
     // background loading (folders, wavetables, banks)
     void runAsync (std::function<void()> fn) { pool.addJob (std::move (fn)); }
+    // Called on the audio thread before each block of an offline render (a bounce, a freeze, a command line render):
+    // it may block there, so whatever is still loading is finished before the first note instead of being missed.
+    virtual void waitForLoads() { for (int i = 0; i < 30000 && pool.getNumJobs() > 0; ++i) juce::Thread::sleep (1); }
     void stopJobs() { pool.removeAllJobs (true, 10000); }
 private:
     juce::ThreadPool pool { juce::ThreadPoolOptions().withNumberOfThreads (1).withThreadName ("EX loader") };
 };
 
-class ExPlugin : public juce::AudioProcessor, private juce::Timer
+class ExPlugin : public juce::AudioProcessor
 {
 public:
     struct Identity { juce::String product; bool midiOut = false; bool wantsInput = true; int numTimbreChannels = 1; bool midiIn = true; };
     explicit ExPlugin (Identity id);
-    static inline bool rememberLastState = true;   // tests switch this off
-    juce::File lastStateFile() const;
-    void saveLastState();
     static BusesProperties makeBuses (bool wantsInput);
     ~ExPlugin() override;
 
@@ -217,6 +229,9 @@ public:
     int mapL = -1, mapR = 0;           // -1 = use algorithm default; 0 = none / current param for R
     int contrast = 255;
     int curParam[8] { 7, 7, 7, 7, 7, 7, 7, 7 };
+    // editor state that is saved with the plug-in: the open parameter page of each algorithm and the window size
+    int uiSection[8] {};
+    int editorW = 0, editorH = 0;       // 0 = the default size
     void message (const juce::String& text, double seconds = 1.5, bool big = false);
     std::atomic<int> midiInFlash { 0 }, midiOutFlash { 0 };
     std::atomic<bool> allNotesOffRequest { false };
@@ -260,8 +275,7 @@ private:
     void loadPresetFromSd (int index);
     double lastMidiClock = 0; double clockInterval = 0; int64_t clockSamples = 0;
 
-    void timerCallback() override;
-    juce::String lastSavedState;
+    void resetToDefaults();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ExPlugin)
 };
 } // namespace ex

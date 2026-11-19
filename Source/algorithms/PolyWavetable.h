@@ -16,11 +16,11 @@ struct WaveTable
     static std::shared_ptr<WaveTable> fallback();
 };
 
-class PolyWavetable : public PolyAlgorithm
+class PolyWavetable : public PolyAlgorithm, private juce::Timer
 {
 public:
     explicit PolyWavetable (ExPlugin& p);
-    ~PolyWavetable() override { stopJobs(); }
+    ~PolyWavetable() override { stopTimer(); stopJobs(); }
     void prepare (double sampleRate, int block) override;
     void configure() override;
     void renderVoices (float* const* out, int start, int n) override;
@@ -31,6 +31,8 @@ public:
     void drawBottomLine (Oled& o, int cur) override;
     void confirm (int n) override;
     void onSelected() override;
+    void saveExtra (juce::XmlElement& x) const override;
+    void loadExtra (const juce::XmlElement& x) override;
     void addMenuItems (std::vector<MenuItem>& items) override { addStandardPolyMenu (items, true, true); }
     bool pushR (int cur) override;
     std::vector<BrowserSpec> browsers() override;
@@ -63,6 +65,7 @@ private:
     int loudestVoice = -1;
     double lastTap = 0;
     void loadTable (int index);
+    void timerCallback() override;
     float wavePosition (const Voice& v, int vi) const;
 };
 } // namespace ex

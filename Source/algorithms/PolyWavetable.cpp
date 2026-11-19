@@ -193,6 +193,7 @@ PolyWavetable::PolyWavetable (ExPlugin& p) : PolyAlgorithm (p, 10, "Poly Wavetab
     engine.releaseVoice = [this] (int vi) { voices[vi].env1.noteOff(); voices[vi].env2.noteOff(); };
     engine.killVoice = [this] (int vi) { voices[vi].killing = true; };
     engine.voiceSounding = [this] (int vi) { return voices[vi].active; };
+    startTimerHz (8);
 }
 
 void PolyWavetable::prepare (double sampleRate, int block)
@@ -208,6 +209,30 @@ void PolyWavetable::onSelected()
 {
     entries = SdCard::tableEntries ("wavetables", "playlist-wavetable.txt");
     loadTable (appliedValue (7));
+}
+
+// the Wavetable parameter is an index into the card's list: the table's name is saved with it
+void PolyWavetable::saveExtra (juce::XmlElement& x) const
+{
+    const int v = appliedValue (7);
+    if (v >= 0 && v < entries.size()) x.setAttribute ("wavetable", entries[v].getFileName());
+}
+
+void PolyWavetable::loadExtra (const juce::XmlElement& x)
+{
+    if (entries.isEmpty()) entries = SdCard::tableEntries ("wavetables", "playlist-wavetable.txt");
+    juce::StringArray names;
+    for (auto& f : entries) names.add (f.getFileName());
+    const int idx = indexForName (names, pv (7), x.getStringAttribute ("wavetable"));
+    if (idx != pv (7)) { load (7, idx); applied[7] = idx; confirm (7); }
+}
+
+// The Wavetable parameter waits for PUSH V only while it is being turned on the module display. A value that
+// comes from the host (automation, a mapped control) is loaded straight away, so the host and the sound agree.
+void PolyWavetable::timerCallback()
+{
+    if (! awaitingConfirm (7)) { browsing = 0; return; }
+    if (browsing != 7) { applied[7] = pv (7); confirm (7); }
 }
 
 void PolyWavetable::confirm (int n)

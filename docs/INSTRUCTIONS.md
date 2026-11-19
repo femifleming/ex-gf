@@ -23,7 +23,7 @@ IN *                  status line - hover for help                     * OUT
 | Keyboard | **A W S E D F T G Y H U J K O L P ;** play notes, **Z/X** change octave. Click the window first so it has focus. |
 | Window | Drag the corner to resize. It snaps to whole-pixel sizes (1×, 2×, 3×…) so pixels stay sharp. |
 
-**Remembering state:** in a DAW, each instance saves with your project. The plug-ins also keep a *last state* file (in `~/Library/Application Support/EX-GF`, `%APPDATA%\EX-GF` or `~/.config/EX-GF`). New instances and the standalone apps start from where you left off.
+**Defaults and saving:** a new plug-in instance always starts on the default settings. Nothing is loaded by itself: no preset, and no settings left over from another instance or an earlier session. In a DAW, each instance saves with your project, and the DAW's own presets (a device preset in Ableton Live, an `.fxp` / `.vstpreset` / `.aupreset` elsewhere) store and recall every parameter, plus the MIDI channels, the knob mappings, the Granulator's loaded WAV, an FM voice edited from a DX7 editor, the open page and the window size. Sample folders, wavetables, exciter tables and FM banks are saved by name as well as by number, so a preset still finds its folder after the card has changed. SAVE/LOAD presets on the SD card are only loaded when you pick one. The standalone apps reopen with the settings they were closed with.
 
 **Outputs:** *Out 1/2* is the main stereo bus. *Out 3/4* is a second stereo bus. Enable it in your DAW to get per-timbre/per-voice outputs, the paraphonic gate and the mono mix, plus the auto-sampler's CV/gate.
 
@@ -160,6 +160,7 @@ Captures the sound at one moment and sustains it for as long as you like. Four v
 - **LIVE** starts a voice that resynthesizes the live input instead of a frozen moment, so Etherization and pitch shift work on live audio. **UNFREEZE** releases everything.
 - **VOICES / PITCH pages:** gain, pan and coarse/fine pitch shift per voice, added to the global shift. *Attack* and *Release* set the fade times.
 - **MIX / FX pages:** dry and freeze gains, saturation, delay and reverb. Each effect can sit on the *Freeze output* only or on the whole *Output mix*.
+- ***Mono input*** is **Stereo** by default: the dry signal passes through in stereo and the freeze listens to left + right. (The module's default is Mono, which uses the left input only and would drop the right channel of a stereo track.)
 - **VISUALS** switches the module display to the four-quadrant view.
 - **MIDI** (VST3; Audio Unit hosts don't send MIDI to insert effects): C3/D3/E3/F3 select target voices 1-4 and B3 selects Auto; G3 = freeze toggle; A3 = freeze gate; C4/D4/E4/F4 toggle voices 1-4; C5/D5/E5/F5 freeze voices 1-4 while held.
 - **Outputs:** Out 1/2 is the mix; Out 3/4 is the dry input.

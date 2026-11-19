@@ -15,6 +15,12 @@ void ExAlgorithm::set (int n, int v)
     p->endChangeGesture();
 }
 
+void ExAlgorithm::load (int n, int v)
+{
+    const auto& d = def (n);
+    *param (n) = juce::jlimit (d.min, d.max, v);
+}
+
 juce::String ExAlgorithm::valueText (int n, int v) const
 {
     const auto& d = def (n);
@@ -82,31 +88,7 @@ juce::AudioProcessor::BusesProperties ExPlugin::makeBuses (bool wantsInput)
 }
 
 ExPlugin::ExPlugin (Identity id) : juce::AudioProcessor (makeBuses (id.wantsInput)), identity (std::move (id)) {}
-ExPlugin::~ExPlugin()
-{
-    stopTimer();
-    saveLastState();
-}
-
-// The plug-ins remember their last state: it is written to the settings folder whenever it changes
-// (and when the plug-in closes), and a fresh instance starts from it. Hosts restoring a project still
-// override it with the project's own state.
-juce::File ExPlugin::lastStateFile() const
-{
-    return SdCard::globalSettings().getFile().getParentDirectory().getChildFile (identity.product + " - last state.xml");
-}
-
-void ExPlugin::saveLastState()
-{
-    if (! rememberLastState || algs.empty()) return;
-    auto text = stateXml()->toString();
-    if (text == lastSavedState) return;
-    auto f = lastStateFile();
-    f.getParentDirectory().createDirectory();
-    if (f.replaceWithText (text)) lastSavedState = text;
-}
-
-void ExPlugin::timerCallback() { saveLastState(); }
+ExPlugin::~ExPlugin() = default;
 
 void ExPlugin::finishSetup()
 {
@@ -129,12 +111,8 @@ void ExPlugin::finishSetup()
             if (d.confirm) a->applied[n] = d.def;
         }
     }
-    if (rememberLastState)
-    {
-        if (auto x = juce::XmlDocument::parse (lastStateFile())) restoreXml (*x);
-        lastSavedState = stateXml()->toString();
-        startTimer (1500);
-    }
+    // A new instance always starts on these defaults. Nothing is read from disk here: state only ever comes
+    // from the host (project, preset) through setStateInformation, or from a preset the user loads.
 }
 
 bool ExPlugin::isBusesLayoutSupported (const BusesLayout& l) const
@@ -219,6 +197,7 @@ void ExPlugin::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&
     outBuf.clear();
     midiOutBuf.clear();
     if (allNotesOffRequest.exchange (false)) alg().allNotesOff();
+    if (isNonRealtime()) alg().waitForLoads();
     juce::AudioBuffer<float> outView (outBuf.getArrayOfWritePointers(), 4, n);
     juce::AudioBuffer<float> inView (inBuf.getArrayOfWritePointers(), 2, n);
     alg().process (outView, inView, midi, midiOutBuf);
@@ -249,12 +228,14 @@ std::unique_ptr<juce::XmlElement> ExPlugin::stateXml() const
     x->setAttribute ("potL", potValue[0]); x->setAttribute ("potR", potValue[1]);
     for (int t = 0; t < 4; ++t) x->setAttribute ("tch" + juce::String (t), timbreChannel[t]);
     x->setAttribute ("voices", PolyNoteEngine::kMaxVoices);
+    if (editorW > 0 && editorH > 0) { x->setAttribute ("editorW", editorW); x->setAttribute ("editorH", editorH); }
     for (size_t i = 0; i < algs.size(); ++i)
     {
         auto& a = *algs[i];
         auto* ax = x->createNewChildElement ("ALG");
         ax->setAttribute ("num", a.number);
         ax->setAttribute ("cur", curParam[i]);
+        ax->setAttribute ("page", uiSection[i]);
         ax->setAttribute ("midiEnable", a.midiNotes.enable); ax->setAttribute ("midiLo", a.midiNotes.lowest); ax->setAttribute ("midiHi", a.midiNotes.highest);
         ax->setAttribute ("delayClk", a.delayUsesMidiClock); ax->setAttribute ("paraGate", a.paraphonicGateMode);
         for (int p = 1; p <= a.numParams(); ++p)
@@ -267,8 +248,28 @@ std::unique_ptr<juce::XmlElement> ExPlugin::stateXml() const
     return x;
 }
 
+void ExPlugin::resetToDefaults()
+{
+    for (size_t i = 0; i < algs.size(); ++i)
+    {
+        auto& a = *algs[i];
+        a.midiNotes = {}; a.delayUsesMidiClock = false; a.paraphonicGateMode = 0;
+        for (int p = 1; p <= a.numParams(); ++p)
+        {
+            a.load (p, a.def (p).def);
+            if (a.def (p).confirm) { a.applied[p] = a.pv (p); a.confirm (p); }
+        }
+    }
+}
+
 void ExPlugin::restoreXml (const juce::XmlElement& x)
 {
+    // a state made by another plug-in of the suite is not ours to load
+    if (! x.hasTagName ("EXSTATE")) return;
+    if (auto product = x.getStringAttribute ("product"); product.isNotEmpty() && product != identity.product) return;
+    // anything the state does not mention goes back to its default, so loading the same preset always gives the same result
+    resetToDefaults();
+    editorW = x.getIntAttribute ("editorW", 0); editorH = x.getIntAttribute ("editorH", 0);
     rxChannel = x.getIntAttribute ("rx", 1); txChannel = x.getIntAttribute ("tx", 1);
     contrast = x.getIntAttribute ("contrast", 255);
     mapL = x.getIntAttribute ("mapL", -1); mapR = x.getIntAttribute ("mapR", 0);
@@ -283,6 +284,7 @@ void ExPlugin::restoreXml (const juce::XmlElement& x)
             auto& a = *algs[i];
             if (a.number != num) continue;
             curParam[i] = juce::jlimit (1, a.numParams(), ax->getIntAttribute ("cur", 7));
+            uiSection[i] = juce::jmax (0, ax->getIntAttribute ("page", 0));
             a.midiNotes.enable = ax->getIntAttribute ("midiEnable", 1);
             a.midiNotes.lowest = ax->getIntAttribute ("midiLo", 0);
             a.midiNotes.highest = ax->getIntAttribute ("midiHi", 127);
@@ -293,14 +295,14 @@ void ExPlugin::restoreXml (const juce::XmlElement& x)
                 int p = px->getIntAttribute ("n");
                 if (p >= 1 && p <= a.numParams())
                 {
-                    a.set (p, px->getIntAttribute ("v"));
+                    a.load (p, px->getIntAttribute ("v"));
                     if (a.def (p).confirm) { a.applied[p] = a.pv (p); a.confirm (p); }
                 }
             }
             // states saved when the limit was 8 voices: "all 8" becomes "all 16"
             if (savedVoices < PolyNoteEngine::kMaxVoices)
                 for (int p = 1; p <= a.numParams(); ++p)
-                    if (a.def (p).name == "Max voices" && a.pv (p) == savedVoices) a.set (p, PolyNoteEngine::kMaxVoices);
+                    if (a.def (p).name == "Max voices" && a.pv (p) == savedVoices) a.load (p, PolyNoteEngine::kMaxVoices);
             a.loadExtra (*ax);
         }
     }
@@ -481,6 +483,7 @@ void ExPlugin::turnV (int d)
         return;
     }
     int cur = curParam[current.load()];
+    if (alg().def (cur).confirm) alg().browsing = cur;
     alg().set (cur, alg().pv (cur) + d);
 }
 
@@ -522,6 +525,7 @@ void ExPlugin::setPot (int which, float v01)
     int p = which == 1 ? (mapR > 0 ? mapR : (a.defaultR > 0 ? a.defaultR : curParam[current.load()])) : (mapL < 0 ? a.defaultL : mapL);
     if (p <= 0 || p > a.numParams()) return;
     const auto& d = a.def (p);
+    if (d.confirm) a.browsing = p;
     a.set (p, d.min + juce::roundToInt (potValue[which] * (float) (d.max - d.min)));
     if (which == 1 && mapR == 0 && a.defaultR == 0 && ! menuOpen) curParam[current.load()] = p;
 }

@@ -67,6 +67,9 @@ jobs:
             tail -2 "$RUNNER_TEMP/auval.txt"
             grep -q "AU VALIDATION SUCCEEDED" "$RUNNER_TEMP/auval.txt"
           done
+          # every plug-in in both formats, each in fresh processes: defaults, presets, a clean next instance, audio, stereo
+          python3 tools/audit.py build-release/EXTest_artefacts/Release/EXTest "$RUNNER_TEMP/audit" \
+            build-release/*_artefacts/Release/VST3/*.vst3 ~/Library/Audio/Plug-Ins/Components/EX*.component
 
       - name: Tests (Linux)
         if: runner.os == 'Linux'

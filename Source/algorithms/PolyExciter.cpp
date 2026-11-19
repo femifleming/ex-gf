@@ -149,6 +149,21 @@ void PolyExciter::prepare (double sampleRate, int block)
     if (entries.isEmpty()) onSelected();
 }
 
+// the Table parameter is an index into the card's list: the table's name is saved with it
+void PolyExciter::saveExtra (juce::XmlElement& x) const
+{
+    const int v = pv (8);
+    if (v >= 0 && v < entries.size()) x.setAttribute ("exciterTable", entries[v].getFileName());
+}
+
+void PolyExciter::loadExtra (const juce::XmlElement& x)
+{
+    if (entries.isEmpty()) entries = SdCard::tableEntries ("exciters", "");
+    juce::StringArray names;
+    for (auto& f : entries) names.add (f.getFileName());
+    if (pv (8) >= 0) load (8, indexForName (names, pv (8), x.getStringAttribute ("exciterTable")));
+}
+
 void PolyExciter::onSelected()
 {
     entries = SdCard::tableEntries ("exciters", "");
